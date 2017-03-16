@@ -1,0 +1,152 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        .form-control:focus {
+            border: 1px #222087 solid;
+            border-radius: 0px;
+            /*
+    box-shadow: 0 0px 0px #222087 inset, 0 0 10px #d7d7d7;
+    outline: 0 none;
+*/
+        }
+        div {
+            border: 0px solid black
+        }
+        em {
+            font-weight: bold
+        }
+        #footer {
+            z-index: 400;
+            top: 95%;
+        }
+        #container {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            position: absolute;
+            background-color: #F2F2F2;
+            height:100%
+        }
+        #search-list {
+            display: none;
+            top: 0%;
+            margin-top: 100px;
+            width: 80%;
+            height: 80%;
+            left: 10%;
+            position: absolute;
+            z-index: 101;
+            overflow-y: scroll
+        }
+        #right-img {
+            width: 130px;
+        }
+        #btn-find-path,
+        .ext-choice,
+        .ext-choice-cat {
+            display: none;
+        }
+        li a {
+            cursor: pointer;
+        }
+
+        #lineChart,
+        #riverChart
+        {
+            position: fixed;
+            left: 0px;
+            right: 0px;
+            top: 50px;
+            bottom: 0px;
+        }
+
+    </style>
+
+</head>
+    {% load static %}
+    {% block head %}
+      <link href="{% static 'css/enhance.css' %}" rel="stylesheet">
+    {% endblock head %}
+
+
+<body>
+    <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Preparing data...</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active" style="width: 100%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="errorModal" tabindex="-1">
+        <p id="errorModalP">
+            Cannot fulfill this request..
+        </p>
+    </div>
+
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="container-fluid">
+            <div class="navbar-header" id="dvHeader">
+                <a class="navbar-brand" href="#">VISearch</a>
+                <div id="beta">
+                </div>
+            </div>
+
+            <div class="collapse navbar-collapse">
+
+                <div class="dropdown navbar-form navbar-left ">
+                    <button class="btn btn-default dropdown-toggle" style="width:110px" type="button" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span id="dropdownLabel">
+		    Line Chart
+                    </span>
+		    <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+		    <li><a class="btn-chart-type" targ="line"  href="#">Line Chart</a></li>
+		    <li><a class="btn-chart-type" targ="river" href="#">River Chart</a></li>
+		  </ul>
+		</div>
+
+                <div class="navbar-form navbar-left">
+                    <div class="btn-group">
+                        <input id="inpt-inpage-search" class="form-control" placeholder="Search">
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <div id="container">
+        <div id="lineChart">
+            <svg id="lineChartSvg"></svg>
+        </div>
+        <div id="riverChart">
+            <svg id="riverChartSvg"></svg>
+        </div>
+    </div>
+
+</body>
+    
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="{% static 'js/vischart.js' %}"></script>
+<script src="{% static 'js/mjs.js' %}"></script>
+
+</html>
