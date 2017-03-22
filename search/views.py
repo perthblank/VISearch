@@ -25,7 +25,7 @@ def search0(request):
 def searchRiver(request):
     if request.method == "POST":
         mdb_hand = mdb.MDB()
-        data = mdb_hand.searchRiver(request.POST.get('content'))
+        data = mdb_hand.searchRiver(request.POST.get('content'), request.POST.get('qtype'))
         return HttpResponse(
             json.dumps(data),
             content_type="application/json"

@@ -65,23 +65,46 @@ function checkKey(event)
     if(keycode == 13)
     {
         let text = $("#inpt-inpage-search").val();
+        if(text=="")
+            text = "lighting, texture, material, shadow";
         if(curFlag == "line")
             sendAndGet({"content":text}, search_url,"POST",handle0);
         else
-            sendAndGet({"content":text}, searchRiver_url,"POST",handle1);
+        {
+            var qtype = 0;
+            var chkKw = document.getElementById('chkKw').checked;
+            var chkAb = document.getElementById('chkAb').checked;
+
+            if(!chkAb && !chkKw)
+            {
+                alert("choose query field");
+                return;
+            }
+
+            if(chkKw && chkAb)
+                qtype = 3;
+            else if(chkKw)
+                qtype = 1;
+            else
+                qtype = 2;
+            sendAndGet({"content":text, "qtype":qtype}, searchRiver_url,"POST",handle1);
+        }
     }
 }
 
-$("#riverChartSvg").hide(); 
+$("#lineChartSvg").hide(); 
 $("#inpt-inpage-search").keydown(function(e){checkKey(e);});
 
 var lineChart = new LineChart("lineChartSvg");
 var riverChart = new RiverChart("riverChartSvg");
 
-var curFlag = "line";
+var curFlag = "river";
 
 $(".btn-chart-type").click(function(e){
     e.preventDefault();
+
+    tooltip.html("");
+
     $("#dropdownLabel").text($(this).text());
     if($(this).attr("targ")=="line")
     {

@@ -23,19 +23,22 @@ class MDB(object):
         return {"kw":kw.count(), "te":te.count()}
 
     def searchPerYear(self, word):
+        word = word.strip().lower();
         startYear = 1990
         endYear = 2015
+        words = word.split(' ');
         te = []
         kw = []
         for year in range(startYear, endYear+1):
             count = self.coll.find({"Year":year, "$text":{"$search":word}}).count()
             te.append({"year":year, "count":count})
-            count = self.coll.find({"Year":year, "Author Keywords":{"$in":[word]}}).count()
+            count = self.coll.find({"Year":year, "Author Keywords":{"$all":words}}).count()
             kw.append({"year":year, "count":count})
             
         return {"text":te, "keyword":kw}
 
-    def searchRiver(self, words):
+    def searchRiver(self, words, qtype):
+        words = words.lower()
         wordlist = [w.strip() for w in words.split(",")]
         res = []
         startYear = 1990
@@ -43,9 +46,15 @@ class MDB(object):
         for year in range(startYear, endYear+1):
             ent = {"year":year}
             for word in wordlist:
-                count = self.coll.find({"Year":year, "Author Keywords":{"$in":[word]}}).count()
+                words = word.split(' ')
+                print qtype
+                if(int(qtype)==1):
+                    count = self.coll.find({"Year":year, "Author Keywords":{"$all":words}}).count()
+                else:
+                    count = self.coll.find({"Year":year, "$text":{"$search":word}}).count()
+
                 ent[word] = count 
                 
             res.append(ent)
             
-        return {"data":res, "keys":wordlist} 
+        return {"data":res, "keys":wordlist, "qtype":qtype} 

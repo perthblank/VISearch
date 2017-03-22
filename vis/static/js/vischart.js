@@ -1,5 +1,15 @@
 var default_color = {"text":"steelblue","keyword":"red"};
 
+
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "remove")
+    .style("position", "absolute")
+    .style("z-index", "20")
+    .style("visibility", "hidden")
+    .style("top", "80px")
+    .style("left", "65px");
+
 class LineChart
 {
     constructor(parentID)
@@ -210,8 +220,6 @@ class RiverChart
         x.domain(d3.extent(data, function(d) { return d.date; }));
   	z.domain(keys);
 
-
-
   	stack.keys(keys);
 
         var stackedData = stack(data)
@@ -237,12 +245,32 @@ class RiverChart
   	    .style("text-anchor", "end")
   	    .text(function(d) { return d.key; });
 
-	 g.append("g")
-  	    .attr("class", "axis axis--x")
-  	    .attr("transform", "translate(0," + height + ")")
-  	    .call(d3.axisBottom(x));
+        layer.on("mouseover", function(d, i) {
+    	    svg.selectAll(".layer").transition()
+    	    .duration(250)
+    	    .attr("opacity", function(d, j) {
+    	        return j != i ? 0.6 : 1;
+            })
+            tooltip.html( "<p>" + d.key + "<br>" + "</p>" ).style("visibility", "visible");
+	}).on("mouseout", function(d, i) {
+            svg.selectAll(".layer")
+            .transition()
+            .duration(250)
+            .attr("opacity", "1"); 
+        }).on("mousemove", function(d, i) {
+            var mousex = d3.mouse(this);
+            mousex = mousex[0];
+            var invertedx = Math.round(x.invert(mousex).getYear()-90+0.4);
+	    var val = (d[invertedx][1]-d[invertedx][0]);
+            tooltip.html( "<p>" + d.key + " on " + (invertedx+1990) +  "<br>" + val + "</p>" ).style("visibility", "visible");
+   	});
 
-  	 g.append("g")
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
   	    .attr("class", "axis axis--y")
   	    .call(d3.axisLeft(y));
 
