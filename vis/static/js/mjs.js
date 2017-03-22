@@ -110,11 +110,13 @@ $(".btn-chart-type").click(function(e){
     {
         $("#lineChartSvg").show(); 
         $("#riverChartSvg").hide(); 
+        $("#chkbox").hide();
     }
     else
     {
         $("#lineChartSvg").hide(); 
         $("#riverChartSvg").show(); 
+        $("#chkbox").show();
     }
     curFlag = $(this).attr("targ");
 });

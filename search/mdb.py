@@ -47,7 +47,6 @@ class MDB(object):
             ent = {"year":year}
             for word in wordlist:
                 words = word.split(' ')
-                print qtype
                 if(int(qtype)==1):
                     count = self.coll.find({"Year":year, "Author Keywords":{"$all":words}}).count()
                 else:
