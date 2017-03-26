@@ -10,6 +10,10 @@
     outline: 0 none;
 */
         }
+        
+        body{
+            background-color: #F2F2F2;
+        }
         div {
             border: 0px solid black
         }
@@ -25,19 +29,18 @@
             left: 0;
             right: 0;
             position: absolute;
-            background-color: #F2F2F2;
-            height:100%
         }
-        #search-list {
-            display: none;
-            top: 0%;
-            margin-top: 100px;
-            width: 80%;
-            height: 80%;
-            left: 10%;
-            position: absolute;
-            z-index: 101;
-            overflow-y: scroll
+        #searchList {
+            border-top:3px solid #DDDDDD;
+            overflow-y: scroll;
+            margin-top:40%;
+            position:absolute;
+            background-color:white;
+            max-height:100%;
+            width:100%;
+            padding:30px;
+            background-color: #F0F0F0;
+            z-index:22;
         }
         #right-img {
             width: 130px;
@@ -117,12 +120,12 @@
 		</div>
 
                 <div class="navbar-form navbar-left">
-                    <div id="chkbox" class="checkbox btn-group">
+                    <div id="chkbox" class="radio">
                          <label>
-                           <input id="chkKw" type="checkbox" checked="true"> Author Keywords
+                           <input id="chkKw" type="radio" name="qtype" checked="true"> Author Keywords
                          </label>
                          <label>
-                           <input id="chkAb" type="checkbox"> Abstract
+                           <input id="chkAb" type="radio" name="qtype"> Abstract
                          </label>
                     </div>
                     <div class="btn-group">
@@ -137,13 +140,14 @@
     </nav>
 
     <div id="container">
-        <div id="lineChart">
-            <svg id="lineChartSvg"></svg>
-        </div>
-        <div id="riverChart">
-            <svg id="riverChartSvg"></svg>
-        </div>
-    </div>
+        <div id="lineChart"></div>
+        <div id="riverChart"></div>
+   </div>
+
+   <div id="searchList">
+   </div>
+ 
+
 
 </body>
     

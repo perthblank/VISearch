@@ -57,3 +57,23 @@ class MDB(object):
             res.append(ent)
             
         return {"data":res, "keys":wordlist, "qtype":qtype} 
+
+    def searchList(self, key, year, fields,  qtype):
+    	res = []
+        found = 0
+
+        print fields
+        fields = fields.split(",")
+
+        if(int(qtype)==1):
+            found =  self.coll.find({"Year":int(year), "Author Keywords":{"$all":[key]} })
+        else:
+            found =  self.coll.find({"Year":int(year), "$text":{"$search":key} })
+
+        for ent in found:
+            v = {};
+            for f in fields:
+                v[f] = ent[f]
+            res.append(v)
+            
+        return res

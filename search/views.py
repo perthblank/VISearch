@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 @csrf_exempt 
-def search0(request):
+def searchLine(request):
     if request.method == "POST":
         mdb_hand = mdb.MDB()
         data = mdb_hand.searchPerYear(request.POST.get('content'))
@@ -33,4 +33,15 @@ def searchRiver(request):
     return "ERROR!!!!!"
 
 
+
+@csrf_exempt 
+def searchList(request):
+    if request.method == "POST":
+        mdb_hand = mdb.MDB()
+        data = mdb_hand.searchList(request.POST.get('key'), request.POST.get('year'), request.POST.get('fields'), request.POST.get('qtype'))
+        return HttpResponse(
+            json.dumps(data),
+            content_type="application/json"
+        );
+    return "ERROR!!!!!"
 

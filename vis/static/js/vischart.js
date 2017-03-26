@@ -1,14 +1,22 @@
 var default_color = {"text":"steelblue","keyword":"red"};
 
-
 var tooltip = d3.select("body")
     .append("div")
     .attr("class", "remove")
-    .style("position", "absolute")
+    .style("position", "fixed")
     .style("z-index", "20")
     .style("visibility", "hidden")
     .style("top", "80px")
     .style("left", "65px");
+
+
+class VisChart
+{
+    constructor()
+    {
+
+    }
+}
 
 class LineChart
 {
@@ -76,7 +84,7 @@ class LineChart
     init(data, label)
     {
         var margin = {top: 20, right: 50, bottom: 30, left: 50},
-          svg = d3.select("#"+this.parentID);
+          svg = d3.select("#"+this.parentID).append("svg");
 
         var chartDiv = document.getElementById("lineChart");
         var divWidth = chartDiv.clientWidth;
@@ -102,8 +110,6 @@ class LineChart
             .x(function(d) { return x(d.year); })
             .y(function(d) { return y(d.count); });
          
-
-
         if(this.inited == false)
         {
             var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -115,9 +121,6 @@ class LineChart
 
             this.g = g;
         }
-
-
-
 
         var axis;
        
@@ -164,10 +167,11 @@ class LineChart
 }
 
 
-class RiverChart
+class RiverChart extends VisChart
 {
     constructor(parentID)
     {
+        super();
         this.inited = false; 
         this.parentID = parentID;
     }
@@ -177,7 +181,7 @@ class RiverChart
         d3.select("#"+this.parentID).selectAll("*").remove();
         var keys = meta["keys"];
         var data = meta["data"];
-        var svg = d3.select("#"+this.parentID),
+        var svg = d3.select("#"+this.parentID).append("svg"),
             margin = {top: 20, right: 20, bottom: 30, left: 50};
 
 
@@ -245,7 +249,8 @@ class RiverChart
   	    .style("text-anchor", "end")
   	    .text(function(d) { return d.key; });
 
-        layer.on("mouseover", function(d, i) {
+        layer.attr("opacity", 1)
+	.on("mouseover", function(d, i) {
     	    svg.selectAll(".layer").transition()
     	    .duration(250)
     	    .attr("opacity", function(d, j) {
@@ -257,13 +262,23 @@ class RiverChart
             .transition()
             .duration(250)
             .attr("opacity", "1"); 
+
+            //tooltip.html("");
         }).on("mousemove", function(d, i) {
             var mousex = d3.mouse(this);
-            mousex = mousex[0];
-            var invertedx = Math.round(x.invert(mousex).getYear()-90+0.4);
-	    var val = (d[invertedx][1]-d[invertedx][0]);
-            tooltip.html( "<p>" + d.key + " on " + (invertedx+1990) +  "<br>" + val + "</p>" ).style("visibility", "visible");
-   	});
+            mousex = mousex[0]+20;
+            var offset = Math.round(x.invert(mousex).getYear()-90);
+	    var val = (d[offset][1]-d[offset][0]);
+            tooltip.html("<p>" + d.key + " on " + (offset+1990) +  "<br>" + val + "</p>" ).style("visibility", "visible");
+   	}).on("click",function(d,i){
+
+            var mousex = d3.mouse(this);
+            mousex = mousex[0]+20;
+            var offset = Math.round(x.invert(mousex).getYear()-90);
+            var year = offset+1990;
+            searchList(d.key, year);
+            d3.event.stopPropagation();
+        });
 
         g.append("g")
             .attr("class", "axis axis--x")
@@ -274,5 +289,31 @@ class RiverChart
   	    .attr("class", "axis axis--y")
   	    .call(d3.axisLeft(y));
 
+        var vertical = d3.select("#"+this.parentID)
+            .append("div")
+            .attr("class", "remove")
+            .style("position", "absolute")
+            .style("z-index", "119")
+            .style("width", "1px")
+            .style("height", (height+30)+"px")
+            .style("top", "10px")
+            .style("bottom", "3px")
+            .style("left", "0px")
+            .style("background", "#fff");
+      
+        d3.select("#"+this.parentID)
+            .on("mousemove", function(){  
+               var mousex = d3.mouse(this);
+               mousex = mousex[0];
+               vertical.style("left", (mousex +5) + "px" )})
+            .on("mouseover", function(){  
+               var mousex = d3.mouse(this);
+               mousex = mousex[0];
+               vertical.style("left", (mousex +5) + "px")});
+
+        svg.on("click",function(){
+            $("html, body").animate({ scrollTop: 0}, 200); 
+        });
     }
 }
+
