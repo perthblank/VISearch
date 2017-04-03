@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.http import JsonResponse
 
 from . import mdb
 
@@ -43,5 +44,19 @@ def searchList(request):
             json.dumps(data),
             content_type="application/json"
         );
+    return "ERROR!!!!!"
+
+
+@csrf_exempt 
+def searchHeat(request):
+    if request.method == "POST":
+        mdb_hand = mdb.MDB()
+        data = mdb_hand.searchHeat(request.POST.get('content'), request.POST.get('qtype'))
+        #print data
+        return JsonResponse(data);
+        #return HttpResponse(
+        #    json.dumps(data),
+        #    content_type="application/json"
+        #);
     return "ERROR!!!!!"
 

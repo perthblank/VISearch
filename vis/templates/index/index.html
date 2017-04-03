@@ -55,7 +55,8 @@
         }
 
         #lineChart,
-        #riverChart
+        #riverChart,
+        #heatChart
         {
             position: fixed;
             left: 0px;
@@ -116,6 +117,7 @@
 		  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
 		    <li><a class="btn-chart-type" targ="river" href="#">River Chart</a></li>
 		    <li><a class="btn-chart-type" targ="line"  href="#">Line Chart</a></li>
+		    <li><a class="btn-chart-type" targ="heat"  href="#">Heat Map</a></li>
 		  </ul>
 		</div>
 
@@ -142,6 +144,7 @@
     <div id="container">
         <div id="lineChart"></div>
         <div id="riverChart"></div>
+        <div id="heatChart"></div>
    </div>
 
    <div id="searchList">
@@ -159,6 +162,7 @@
       crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 <script src="{% static 'js/vischart.js' %}"></script>
+<script src="{% static 'js/heatchart.js' %}"></script>
 <script src="{% static 'js/mjs.js' %}"></script>
 
 </html>

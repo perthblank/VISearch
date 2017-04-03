@@ -10,6 +10,9 @@ class MDB(object):
         self.client = pymongo.MongoClient(self.ip, self.port)
         self.db = self.client.vis
         self.coll = self.db[self.cname]
+
+        self.startYear = 1990
+        self.endYear = 2015
     
     def search(self, word):
         if(word==""):
@@ -24,12 +27,10 @@ class MDB(object):
 
     def searchPerYear(self, word):
         word = word.strip().lower();
-        startYear = 1990
-        endYear = 2015
         words = word.split(' ');
         te = []
         kw = []
-        for year in range(startYear, endYear+1):
+        for year in range(self.startYear, self.endYear+1):
             count = self.coll.find({"Year":year, "$text":{"$search":word}}).count()
             te.append({"year":year, "count":count})
             count = self.coll.find({"Year":year, "Author Keywords":{"$all":words}}).count()
@@ -41,9 +42,7 @@ class MDB(object):
         words = words.lower()
         wordlist = [w.strip() for w in words.split(",")]
         res = []
-        startYear = 1990
-        endYear = 2015
-        for year in range(startYear, endYear+1):
+        for year in range(self.startYear, self.endYear+1):
             ent = {"year":year}
             for word in wordlist:
                 words = word.split(' ')
@@ -77,3 +76,34 @@ class MDB(object):
             res.append(v)
             
         return res
+
+    def searchHeat(self, key, qtype):
+        res = {}
+        found = 0
+        words = key.split(",");
+        confs = {}
+        for year in range(self.startYear, self.endYear+1):
+            if(int(qtype)==1):
+                found = self.coll.find({"Year":year, "Author Keywords":{"$all":words}})
+            else:
+                found = self.coll.find({"Year":year, "$text":{"$search":key}})
+            res[year] = {};
+
+            for ent in found:
+                if(not isinstance(ent["Conference"], basestring)):
+                    continue;
+                res[year][ent["Conference"]] = res[year].get(ent["Conference"], 0)+ent["CiteCount"];
+                confs[ent["Conference"]] = 1;
+
+
+        res_arr = []
+
+        for year, val in res.items():
+            for conf, count in val.items():
+                res_arr.append({"year":year, "conf":conf, "citeCount":count})
+
+        return {"data":res_arr};
+        #return {"confs":confs, "data":res_arr};
+
+    #return res
+

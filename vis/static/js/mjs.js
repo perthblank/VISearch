@@ -8,6 +8,7 @@ var port = "8000"
 var searchLine_url = "/search/line/"
 var searchRiver_url = "/search/river/"
 var searchList_url = "/search/list/"
+var searchHeat_url = "/search/heat/"
 
 var listFields = ["Paper Title","Author Names", "Year", "Link"]
 
@@ -37,8 +38,10 @@ function sendAndGet(data, url, type, callback, arg)
             callback(res,arg); 
 
         },
-        error: function(e) {
+        error: function(e, status) {
+            console.log(status);
             console.log(e);
+            JSON.parse(e.responseText);
             errorModal();
         },
         async: false,
@@ -80,20 +83,17 @@ function tabulate(data, c0)
     var thead = table.append('thead')
     var	tbody = table.append('tbody');
     
-    // append the header row
     thead.append('tr')
       .selectAll('th')
       .data(columns).enter()
       .append('th')
         .text(function (column) { return column; });
     
-    // create a row for each object in the data
     var rows = tbody.selectAll('tr')
       .data(data)
       .enter()
       .append('tr');
     
-    // create a cell in each row for each column
     var cells = rows.selectAll('td')
       .data(function (row) {
         return columns.map(function (column) {
@@ -108,6 +108,11 @@ function tabulate(data, c0)
     return table;
 }
 
+function presentHeatChart(data)
+{
+    heatChart.present(data);
+}
+
 var qtype = 0;
 
 function checkKey(event)
@@ -118,27 +123,21 @@ function checkKey(event)
         var text = $("#inpt-inpage-search").val();
         if(text=="")
             text = "lighting, texture, material, shadow";
+
+        var chkKw = document.getElementById('chkKw').checked;
+        var chkAb = document.getElementById('chkAb').checked;
+        if(chkKw)
+            qtype = 1;
+        else
+            qtype = 2;
+
+
         if(curFlag == "line")
             sendAndGet({"content":text}, searchLine_url,"POST",presentLineChart);
-        else
-        {
-            var chkKw = document.getElementById('chkKw').checked;
-            var chkAb = document.getElementById('chkAb').checked;
-
-            if(!chkAb && !chkKw)
-            {
-                alert("choose query field");
-                return;
-            }
-
-            if(chkKw && chkAb)
-                qtype = 3;
-            else if(chkKw)
-                qtype = 1;
-            else
-                qtype = 2;
+        else if(curFlag == "river")
             sendAndGet({"content":text, "qtype":qtype}, searchRiver_url,"POST",presentRiverChart);
-        }
+        else if(curFlag == "heat")
+            sendAndGet({"content":text, "qtype":qtype}, searchHeat_url,"POST",presentHeatChart);
     }
 }
 
@@ -147,6 +146,7 @@ $("#inpt-inpage-search").keydown(function(e){checkKey(e);});
 
 var lineChart = new LineChart("lineChart");
 var riverChart = new RiverChart("riverChart");
+var heatChart = new HeatChart("heatChart");
 
 var curFlag = "river";
 
@@ -156,19 +156,53 @@ $(".btn-chart-type").click(function(e){
     tooltip.html("");
 
     $("#dropdownLabel").text($(this).text());
-    if($(this).attr("targ")=="line")
+    curFlag = $(this).attr("targ");
+
+    if(curFlag=="line")
     {
         $("#lineChart").show(); 
         $("#riverChart").hide(); 
+        $("#heatChart").hide(); 
         $("#chkbox").hide();
     }
-    else
+    else if(curFlag == "river")
     {
         $("#lineChart").hide(); 
         $("#riverChart").show(); 
+        $("#heatChart").hide(); 
         $("#chkbox").show();
     }
-    curFlag = $(this).attr("targ");
+    else if(curFlag == "heat")
+    {
+        $("#lineChart").hide(); 
+        $("#riverChart").hide(); 
+        $("#heatChart").show(); 
+        $("#chkbox").show();
+    }
 });
 
 $("html, body").animate({ scrollTop: 0}, 200); 
+
+
+$("#lineChart").hide(); 
+$("#riverChart").show(); 
+$("#heatChart").hide(); 
+$("#chkbox").show();
+
+var data = [
+    [300,200,5],
+    [300,230,14],
+    [330,215,10],
+]
+
+//var heat = simpleheat('canvasHeat').data(data).max(18).radius(40,15);
+//
+//function draw() {
+//    heat.draw();
+//}
+//
+//heat.mixMode("superimposed");
+//
+//draw();
+//
+//

@@ -12,25 +12,102 @@ var tooltip = d3.select("body")
 
 class VisChart
 {
-    constructor()
+    constructor(parentID)
     {
+        this._parentID = parentID;
+        this._margin = {top: 20, right: 50, bottom: 30, left: 50};
 
+        this._parseTime = d3.timeParse("%Y");
+        var startYear = 1990, endYear = 2015;
+
+        var chartDiv = document.getElementById(parentID);
+        this._svgWidth = chartDiv.clientWidth-100;
+        this._svgHeight = chartDiv.clientHeight-100;
+        this._gWidth = this.svgWidth - this.margin.left - this.margin.right,
+        this._gHeight = this.svgHeight - this.margin.top - this.margin.bottom;
+
+        this._x = d3.scaleTime()
+            .rangeRound([0, this.gWidth])
+            .domain([this.parseTime(startYear), this.parseTime(endYear)]);
+
+        var svg = d3.select("#"+parentID).append("svg");
+        svg.attr("width",this.svgWidth);
+        svg.attr("height",this.svgHeight);
+
+        var g = svg.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+        g.append("g")
+            .attr("transform", "translate(0," + this.gHeight + ")")
+            .call(d3.axisBottom(this.x));
+
+        this._svg = svg;
+        this._g = g;
     }
+
+    get g()
+    {
+        return this._g;
+    }
+
+    get svg()
+    {
+        return this._svg;
+    }
+
+    get parentID()
+    {
+        return this._parentID;
+    }
+
+    get margin()
+    {
+        return this._margin;
+    }
+
+    get parseTime()
+    {
+        return this._parseTime;
+    }
+
+    get svgWidth()
+    {
+        return this._svgWidth;
+    }
+
+    get svgHeight()
+    {
+        return this._svgHeight;
+    }
+
+    get gWidth()
+    {
+        return this._gWidth;
+    }
+
+    get gHeight()
+    {
+        return this._gHeight;
+    }
+
+    get x()
+    {
+        return this._x;
+    }
+
 }
 
-class LineChart
+class LineChart extends VisChart
 {
     constructor(parentID)
     {
+        super(parentID);
         this.inited = false; 
-        this.parentID = parentID;
     }
 
     present(meta)
     {
         var te = meta["text"];
         var kw = meta["keyword"];
-        var parseTime = d3.timeParse("%Y");
+        var parseTime = super.parseTime;
 
         te.forEach(function(e){
             e.year = parseTime(e.year); 
@@ -40,12 +117,11 @@ class LineChart
             e.year = parseTime(e.year); 
         });
 
-
         if(!this.inited) 
         {
             this.init(te, "text");
-            this.inited = true;
             this.init(kw, "keyword");
+            this.inited = true;
         }
         else
         {
@@ -83,26 +159,13 @@ class LineChart
 
     init(data, label)
     {
-        var margin = {top: 20, right: 50, bottom: 30, left: 50},
-          svg = d3.select("#"+this.parentID).append("svg");
+        var svg = super.svg;
 
-        var chartDiv = document.getElementById("lineChart");
-        var divWidth = chartDiv.clientWidth;
-        var divHeight = chartDiv.clientHeight;
-
-        svg.attr("width",divWidth-100);
-        svg.attr("height",divHeight-100);
-
-        var width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom;
-
-
-        var x = d3.scaleTime()
-            .rangeRound([0, width]);
-        x.domain(d3.extent(data, function(d) { return d.year; }));
+        var margin = super.margin;
 
         var y = d3.scaleLinear()
-            .rangeRound([height, 0]);
+            .rangeRound([super.gHeight, 0]);
+        var x = super.x;
 
         y.domain(d3.extent(data, function(d) { return d.count; }));
 
@@ -110,26 +173,14 @@ class LineChart
             .x(function(d) { return x(d.year); })
             .y(function(d) { return y(d.count); });
          
-        if(this.inited == false)
-        {
-            var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-            
-            g.append("g")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x));
-
-            this.g = g;
-        }
-
         var axis;
        
         if(label=="text")
-            axis = this.g.append("g")
+            axis = super.g.append("g")
                 .call(d3.axisLeft(y));
         else
-            axis = this.g.append("g")
-                .attr("transform", "translate( " + width + ", 0 )")
+            axis = super.g.append("g")
+                .attr("transform", "translate( " + super.gWidth + ", 0 )")
                 .call(d3.axisLeft(y));
 
         axis.attr("class","y-axis-"+label)
@@ -142,7 +193,7 @@ class LineChart
             .attr("text-anchor", "end")
             .text(label);
 
-        this.g.append("path")
+        super.g.append("path")
             .datum(data)
             .attr("class","line-path-"+label)
             .attr("fill", "none")
@@ -171,27 +222,17 @@ class RiverChart extends VisChart
 {
     constructor(parentID)
     {
-        super();
+        super(parentID);
         this.inited = false; 
-        this.parentID = parentID;
     }
 
     present(meta)
     {
-        d3.select("#"+this.parentID).selectAll("*").remove();
+        //d3.select("#"+super.parentID).selectAll("*").remove();
         var keys = meta["keys"];
         var data = meta["data"];
-        var svg = d3.select("#"+this.parentID).append("svg"),
-            margin = {top: 20, right: 20, bottom: 30, left: 50};
-
-
-        var chartDiv = document.getElementById("lineChart");
-        var divWidth = chartDiv.clientWidth;
-        var divHeight = chartDiv.clientHeight;
-
-        svg.attr("width",divWidth-100);
-        svg.attr("height",divHeight-100);
-
+        var svg = super.svg;
+            margin = super.margin;
 
         var width = svg.attr("width") - margin.left - margin.right,
             height = svg.attr("height") - margin.top - margin.bottom;
@@ -199,10 +240,7 @@ class RiverChart extends VisChart
         var parseDate = d3.timeParse("%Y");
 
         data.forEach(function(e){
-            e.date = parseDate(e["year"]);
-            keys.forEach(function(k){
-                e[k] = e[k]
-            });
+            e.year = parseDate(e["year"]);
         });
         
         var x = d3.scaleTime().range([0, width]),
@@ -213,7 +251,7 @@ class RiverChart extends VisChart
         var stack = d3.stack();
         
         var area = d3.area()
-            .x(function(d, i) { return x(d.data.date); })
+            .x(function(d, i) { return x(d.data.year); })
             .y0(function(d) { return y(d[0]); })
             .y1(function(d) { return y(d[1]); });
         
@@ -221,7 +259,7 @@ class RiverChart extends VisChart
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
 
 
-        x.domain(d3.extent(data, function(d) { return d.date; }));
+        x.domain(d3.extent(data, function(d) { return d.year; }));
   	z.domain(keys);
 
   	stack.keys(keys);
@@ -240,14 +278,14 @@ class RiverChart extends VisChart
   	    .style("fill", function(d) { return z(d.key); })
   	    .attr("d", area);
 
-  	layer//.filter(function(d) { return d[d.length - 1][1] - d[d.length - 1][0] > 0.01; })
-  	  .append("text")
-  	    .attr("x", width - 6)
-  	    .attr("y", function(d) { return y((d[d.length - 1][0] + d[d.length - 1][1]) / 2); })
-  	    .attr("dy", ".35em")
-  	    .style("font", "10px sans-serif")
-  	    .style("text-anchor", "end")
-  	    .text(function(d) { return d.key; });
+  	//layer//.filter(function(d) { return d[d.length - 1][1] - d[d.length - 1][0] > 0.01; })
+  	//  .append("text")
+  	//    .attr("x", width - 6)
+  	//    .attr("y", function(d) { return y((d[d.length - 1][0] + d[d.length - 1][1]) / 2); })
+  	//    .attr("dy", ".35em")
+  	//    .style("font", "10px sans-serif")
+  	//    .style("text-anchor", "end")
+  	//    .text(function(d) { return d.key; });
 
         layer.attr("opacity", 1)
 	.on("mouseover", function(d, i) {
@@ -289,7 +327,7 @@ class RiverChart extends VisChart
   	    .attr("class", "axis axis--y")
   	    .call(d3.axisLeft(y));
 
-        var vertical = d3.select("#"+this.parentID)
+        var vertical = d3.select("#"+super.parentID)
             .append("div")
             .attr("class", "remove")
             .style("position", "absolute")
@@ -301,7 +339,7 @@ class RiverChart extends VisChart
             .style("left", "0px")
             .style("background", "#fff");
       
-        d3.select("#"+this.parentID)
+        d3.select("#"+super.parentID)
             .on("mousemove", function(){  
                var mousex = d3.mouse(this);
                mousex = mousex[0];
@@ -316,4 +354,5 @@ class RiverChart extends VisChart
         });
     }
 }
+
 
