@@ -231,23 +231,19 @@ class RiverChart extends VisChart
         //d3.select("#"+super.parentID).selectAll("*").remove();
         var keys = meta["keys"];
         var data = meta["data"];
-        var svg = super.svg;
+        var svg = super.svg,
             margin = super.margin;
-
-        var width = svg.attr("width") - margin.left - margin.right,
-            height = svg.attr("height") - margin.top - margin.bottom;
         
-        var parseDate = d3.timeParse("%Y");
+        var parseTime = this.parseTime;
 
         data.forEach(function(e){
-            e.year = parseDate(e["year"]);
+            e.year = parseTime(e["year"]);
         });
         
-        var x = d3.scaleTime().range([0, width]),
-            y = d3.scaleLinear().range([height, 0]),
+        var x = this.x,
+            y = d3.scaleLinear().range([this.gHeight, 0]),
             z = d3.scaleOrdinal(d3.schemeCategory10);
 
-        
         var stack = d3.stack();
         
         var area = d3.area()
@@ -255,11 +251,8 @@ class RiverChart extends VisChart
             .y0(function(d) { return y(d[0]); })
             .y1(function(d) { return y(d[1]); });
         
-        var g = svg.append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+        var g = this.g;
 
-
-        x.domain(d3.extent(data, function(d) { return d.year; }));
   	z.domain(keys);
 
   	stack.keys(keys);
@@ -277,15 +270,6 @@ class RiverChart extends VisChart
   	    .attr("class", "area")
   	    .style("fill", function(d) { return z(d.key); })
   	    .attr("d", area);
-
-  	//layer//.filter(function(d) { return d[d.length - 1][1] - d[d.length - 1][0] > 0.01; })
-  	//  .append("text")
-  	//    .attr("x", width - 6)
-  	//    .attr("y", function(d) { return y((d[d.length - 1][0] + d[d.length - 1][1]) / 2); })
-  	//    .attr("dy", ".35em")
-  	//    .style("font", "10px sans-serif")
-  	//    .style("text-anchor", "end")
-  	//    .text(function(d) { return d.key; });
 
         layer.attr("opacity", 1)
 	.on("mouseover", function(d, i) {
@@ -319,21 +303,16 @@ class RiverChart extends VisChart
         });
 
         g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
-
-        g.append("g")
   	    .attr("class", "axis axis--y")
   	    .call(d3.axisLeft(y));
 
-        var vertical = d3.select("#"+super.parentID)
-            .append("div")
+        var vertical = d3.select("#"+this.parentID)
+          .append("div")
             .attr("class", "remove")
             .style("position", "absolute")
             .style("z-index", "119")
             .style("width", "1px")
-            .style("height", (height+30)+"px")
+            .style("height", (this.gHeight+30)+"px")
             .style("top", "10px")
             .style("bottom", "3px")
             .style("left", "0px")
