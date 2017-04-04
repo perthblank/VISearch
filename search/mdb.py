@@ -54,20 +54,30 @@ class MDB(object):
                 ent[word] = count 
                 
             res.append(ent)
-            
         return {"data":res, "keys":wordlist, "qtype":qtype} 
 
-    def searchList(self, key, year, fields,  qtype):
+    #def searchList(self, key, year, fields,  qtype):
+    def searchList(self, meta):
+        fields = meta["fields"]
+        qtype = meta["qtype"]
+        data = meta["data"]
+
     	res = []
         found = 0
-
-        print fields
         fields = fields.split(",")
+        year = data["Year"]
+        key = data["key"]
+        condition = {"Year": int(year)}
 
         if(int(qtype)==1):
-            found =  self.coll.find({"Year":int(year), "Author Keywords":{"$all":[key]} })
+            condition["Author Keywords"] = {"$all":[key]} 
         else:
-            found =  self.coll.find({"Year":int(year), "$text":{"$search":key} })
+            condition["$text"] = {"$search":key}
+
+        if "Conference" in data:
+            condition["Conference"] = data["Conference"]
+
+        found = self.coll.find(condition)
 
         for ent in found:
             v = {};
@@ -102,7 +112,7 @@ class MDB(object):
             for conf, count in val.items():
                 res_arr.append({"year":year, "conf":conf, "citeCount":count})
 
-        return {"data":res_arr};
+        return {"data":res_arr, "key": key};
         #return {"confs":confs, "data":res_arr};
 
     #return res

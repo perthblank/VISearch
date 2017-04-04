@@ -33,13 +33,12 @@ def searchRiver(request):
         );
     return "ERROR!!!!!"
 
-
-
 @csrf_exempt 
 def searchList(request):
     if request.method == "POST":
         mdb_hand = mdb.MDB()
-        data = mdb_hand.searchList(request.POST.get('key'), request.POST.get('year'), request.POST.get('fields'), request.POST.get('qtype'))
+        req = json.loads(request.POST.get('dataStr'))
+        data = mdb_hand.searchList(req)
         return HttpResponse(
             json.dumps(data),
             content_type="application/json"

@@ -10,7 +10,7 @@ var searchRiver_url = "/search/river/"
 var searchList_url = "/search/list/"
 var searchHeat_url = "/search/heat/"
 
-var listFields = ["Paper Title","Author Names", "Year", "Link"]
+var listFields = ["Paper Title","Author Names", "Year", "CiteCount", "Link" ]
 
 function errorModal(text)
 {
@@ -41,7 +41,7 @@ function sendAndGet(data, url, type, callback, arg)
         error: function(e, status) {
             console.log(status);
             console.log(e);
-            JSON.parse(e.responseText);
+      //      JSON.parse(e.responseText);
             errorModal();
         },
         async: false,
@@ -49,10 +49,15 @@ function sendAndGet(data, url, type, callback, arg)
     });
 }
 
-function searchList(key, year)
+
+function searchList(data)
 {
-    sendAndGet({key:key, year:year, fields:listFields.join(","), qtype:qtype}, searchList_url,"POST",presentList);
+    var meta = {"data":data};
+    meta["fields"] =  listFields.join(",");
+    meta["qtype"] = qtype;
+    sendAndGet({"dataStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
 }
+
 
 
 function presentLineChart(data)
@@ -67,6 +72,9 @@ function presentRiverChart(data)
 
 function presentList(data)
 {
+    data.sort(function(a,b){
+        return b.CiteCount - a.CiteCount; 
+    })
     tabulate(data, listFields);
     $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 }
@@ -74,7 +82,6 @@ function presentList(data)
 
 function tabulate(data, c0) 
 {
-
     columns = c0.slice(0,-1);
 
     d3.select('#searchList').html("");

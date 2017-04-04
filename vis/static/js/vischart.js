@@ -7,7 +7,7 @@ var tooltip = d3.select("body")
     .style("z-index", "20")
     .style("visibility", "hidden")
     .style("top", "80px")
-    .style("left", "65px");
+    .style("right", "65px");
 
 
 class VisChart

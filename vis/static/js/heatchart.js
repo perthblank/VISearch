@@ -11,6 +11,7 @@ class HeatChart extends VisChart
         var parseTime = this.parseTime;
         meta.data.forEach(function(e){
             e.year = parseTime(e["year"]);
+            //e.year = +e.year;
             e.citeCount = +e.citeCount;
         });
         
@@ -19,19 +20,47 @@ class HeatChart extends VisChart
             this.init(meta);
             this.inited = true;
         }
-        else
-        {
-            this.update(meta.data);
-        }
+
+        this.update(meta.data, meta.key);
     }
 
-    update(data)
+    update(data, currentKey)
     {
         var circles = this.g.selectAll(".dot").data(data);
+        var svg = this.svg;
+        var x = this.x;
 
         circles.enter().append("circle")
             .attr("class", "dot")
           .merge(circles)
+	    .on("mouseover", function(d, i) {
+    	        svg.selectAll(".dot").transition()
+    	            .duration(250)
+    	            .attr("opacity", function(d, j) {
+    	                return j != i ? 0.6 : 1;
+                    })
+	    }).on("mouseout", function(d, i) {
+                svg.selectAll(".dot")
+                .transition()
+                .duration(250)
+                .attr("opacity", "1"); 
+
+            }).on("mousemove", function(d, i) {
+                var year = (d3.timeFormat("%Y")(d.year))
+                tooltip.html(
+                        "<p> key word: " +currentKey + 
+                        "<br/>conference: " + d.conf +
+                        "<br/>year: " + year +  
+                        "<br/>cited " + d.citeCount + " times(s)</p>" ).style("visibility", "visible");
+
+   	    }).on("click",function(d,i){
+
+                var year = (d3.timeFormat("%Y")(d.year))
+                searchList({"Conference": d.conf, "Year": year, "key": currentKey});
+                d3.event.stopPropagation();
+            })
+
+
             .transition()
             .attr("r", function(d){
                 if(d.citeCount==0) 
@@ -40,8 +69,9 @@ class HeatChart extends VisChart
             .attr("cx", this.xMap)
             .attr("cy", this.yMap)
             .style("fill", function(d) 
-                    { return "#bb3455";});
+                    { return "#bb3455";})
 
+            .attr("opacity", 1)
 
         circles.exit().remove();
     }
@@ -81,7 +111,6 @@ class HeatChart extends VisChart
         this.xMap = xMap;
         this.yMap = yMap;
 
-        this.update(data);
 
     }
 

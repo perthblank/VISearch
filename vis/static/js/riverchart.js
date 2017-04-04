@@ -30,9 +30,9 @@ class RiverChart
 
         data.forEach(function(e){
             e.date = parseDate(e["year"]);
-            keys.forEach(function(k){
-                e[k] = e[k]
-            });
+            //keys.forEach(function(k){
+            //    e[k] = e[k]
+            //});
         });
         
         var x = d3.scaleTime().range([0, width]),
@@ -86,7 +86,6 @@ class RiverChart
     	    .attr("opacity", function(d, j) {
     	        return j != i ? 0.6 : 1;
             })
-            tooltip.html( "<p>" + d.key + "<br>" + "</p>" ).style("visibility", "visible");
 	}).on("mouseout", function(d, i) {
             svg.selectAll(".layer")
             .transition()
@@ -99,14 +98,17 @@ class RiverChart
             mousex = mousex[0]+20;
             var offset = Math.round(x.invert(mousex).getYear()-90);
 	    var val = (d[offset][1]-d[offset][0]);
-            tooltip.html("<p>" + d.key + " on " + (offset+1990) +  "<br>" + val + "</p>" ).style("visibility", "visible");
+            tooltip.html(
+                    "<p>keyword: " + d.key + 
+                    "<br/>year: " + (offset+1990) + 
+                    "<br/>" + val + " papers(s)</p>" ).style("visibility", "visible");
    	}).on("click",function(d,i){
 
             var mousex = d3.mouse(this);
             mousex = mousex[0]+20;
             var offset = Math.round(x.invert(mousex).getYear()-90);
             var year = offset+1990;
-            searchList(d.key, year);
+            searchList({"key": d.key, "Year":year});
             d3.event.stopPropagation();
         });
 
