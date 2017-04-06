@@ -111,6 +111,9 @@ class HeatChart extends VisChart
         this.xMap = xMap;
         this.yMap = yMap;
 
+        svg.on("click",function(){
+            $("html, body").animate({ scrollTop: 0}, 200); 
+        });
 
     }
 
