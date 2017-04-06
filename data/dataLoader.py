@@ -100,10 +100,9 @@ class MDB(object):
 mdb = MDB()
 mdb.insert(df)
 mdb.createTextIndex();
+
+
+#test
 mdb.coll.find_one({"Year":1995})
-
-
-# In[ ]:
-
 
 
