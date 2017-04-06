@@ -1,45 +1,59 @@
-#load sheet into mongodb
-
 
 # coding: utf-8
 
+# In[ ]:
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import re
-from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
-import nltk
 import math
 import copy
-
-
-
-filepath = "data.xlsx"
-xl = pd.ExcelFile(filepath)
-print xl.sheet_names
-
-
-
-df0 = xl.parse("Main dataset")
-df0.columns
-
-
-
-criteria = ["Year","Paper Title", "Abstract", "Author Keywords", "Author Names", "References", "Conference", "Link"]
-tosplit = ["Author Keywords"]
-df = df0.loc[:,criteria]
-        
-
 import pymongo
 import pprint
 
+
+# In[ ]:
+
+dataFile = "./data.xlsx"
+dbIP = "127.0.0.1"
+dbPort = 27017
+dbCollection = "main"
+
+
+# In[ ]:
+
+#get data from excel file
+xl = pd.ExcelFile(dataFile)
+df0 = xl.parse("Main dataset")
+#print xl.sheet_names
+#print df0.columns
+criteria = ["Year","Paper Title", "Abstract", 
+            "Author Keywords", "Author Names", "References", "Conference", "Link", "Paper DOI"]
+tosplit = ["Author Keywords"]
+df = df0.loc[:,criteria]
+
+
+# In[ ]:
+
+#get the cited times of each paper
+refcount = {}
+for i, row in df.iterrows():
+    if(not isinstance(row["References"], basestring)):
+        continue
+    refs =  row["References"].split(";")
+    for r in refs:
+        refcount[r] = refcount.get(r, 0)+1;
+        
+
+
+# In[ ]:
+
+#define mdb class
 class MDB(object):
     def __init__(self):
-        self.ip= "192.168.142.130"
-        self.port = 27017
-        self.cname = "main"
+        self.ip= dbIP
+        self.port = dbPort
+        self.cname = dbCollection
         
         self.client = pymongo.MongoClient(self.ip, self.port)
         self.db = self.client.vis
@@ -55,7 +69,6 @@ class MDB(object):
         print "from keyword: ", kw.count()
         print "from abstract & title: ", te.count()
         
-        
     def insert(self, df):
         for i, data in df.iterrows():
             ent = {}
@@ -70,21 +83,27 @@ class MDB(object):
                 else:
                     ent[s] = ""
                     
+            ent["CiteCount"] = refcount.get(data["Paper DOI"], 0)
+                    
             self.coll.insert_one(ent)
+            
+    def createTextIndex(self):
+        self.coll.create_index([("Abstract", pymongo.TEXT)])
+        """
+        db.main.createIndex({Abstract:"text","Paper Title":"text"})
+        """
         
-    
+
+
+# In[ ]:
 
 mdb = MDB()
-
-
 mdb.insert(df)
+mdb.createTextIndex();
+mdb.coll.find_one({"Year":1995})
 
 
-mdb.search("volume")
+# In[ ]:
 
 
 
-"""
-createIndex in mongo
-db.main.createIndex({Abstract:"text","Paper Title":"text"})
-"""
