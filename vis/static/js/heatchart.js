@@ -11,8 +11,7 @@ class HeatChart extends VisChart
         var parseTime = this.parseTime;
         meta.data.forEach(function(e){
             e.year = parseTime(e["year"]);
-            //e.year = +e.year;
-            e.citeCount = +e.citeCount;
+            e.count = +e.count;
         });
         
         if(!this.inited)
@@ -49,23 +48,23 @@ class HeatChart extends VisChart
                 var year = (d3.timeFormat("%Y")(d.year))
                 tooltip.html(
                         "<p> key word: " +currentKey + 
-                        "<br/>conference: " + d.conf +
+                        "<br/>conference: " + d.key +
                         "<br/>year: " + year +  
-                        "<br/>cited " + d.citeCount + " times(s)</p>" ).style("visibility", "visible");
+                        "<br/>cited " + d.count + " times(s)</p>" ).style("visibility", "visible");
 
    	    }).on("click",function(d,i){
 
                 var year = (d3.timeFormat("%Y")(d.year))
-                searchList({"Conference": d.conf, "Year": year, "key": currentKey});
+                searchList({"Conference": d.key, "Year": year, "key": currentKey});
                 d3.event.stopPropagation();
             })
 
 
             .transition()
             .attr("r", function(d){
-                if(d.citeCount==0) 
+                if(d.count==0) 
                     return 0;
-                return Math.log(d.citeCount)*3})
+                return Math.log(d.count)*3})
             .attr("cx", this.xMap)
             .attr("cy", this.yMap)
             .style("fill", function(d) 
@@ -82,18 +81,25 @@ class HeatChart extends VisChart
         var margin = this.margin;
         var g = this.g;
 
-        var confs = meta.confs;
+        var keys = meta.keys;
+        var keysY = [];
+        for(var i = 0; i<keys.length; ++i)
+        {
+            keysY.push(this.gHeight*(0.95-(0.9)/(keys.length-1)*i));
+        }
+        console.log(keysY)
         var data = meta.data;
 
         var xValue = function(d) { return d.year;},
             x = this.x,
             xMap = function(d) { return x(xValue(d));};
         
-        var yValue = function(d) { return d.conf;}, 
+        var yValue = function(d) { return d.key;}, 
             y = d3.scaleOrdinal()
-                     //.domain(confs)
-                     .domain(["vast",'infovis',"scivis","vis"])
-                     .range([this.gHeight*0.95, this.gHeight*0.65, this.gHeight*0.35, this.gHeight*0.05]);
+                     .domain(keys)
+                     //.domain(["vast",'infovis',"scivis","vis"])
+                     //.range([this.gHeight*0.95, this.gHeight*0.65, this.gHeight*0.35, this.gHeight*0.05]);
+                     .range(keysY);
 
             var yMap = function(d) { return y(yValue(d));};
         

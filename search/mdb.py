@@ -13,51 +13,89 @@ class MDB(object):
 
         self.startYear = 1990
         self.endYear = 2015
-    
-    def search(self, word):
-        if(word==""):
-            return {"content":"no data found"}
-        word = word.lower()
-        kw = self.coll.find({"Author Keywords":{"$in":[word]}})
-        te = self.coll.find({"$text":{"$search":word}})
-        
-       # print "from keyword: ", kw.count()
-       # print "from abstract & title: ", te.count()
-        return {"kw":kw.count(), "te":te.count()}
 
-    def searchPerYear(self, word):
-        word = word.strip().lower();
-        words = word.split(' ');
+    def __byKeywords(self, year, content):
+        contents = content.split(' ')
+        return {"Year":year, "Author Keywords":{"$all":contents}}
+
+    def __byText(self, year, content):
+        return {"Year":year, "$text":{"$search":content}}
+
+    """
+    def searchPerYear(self, content):
+        content = content.strip().lower();
+        contents = content.split(' ');
         te = []
         kw = []
         for year in range(self.startYear, self.endYear+1):
-            count = self.coll.find({"Year":year, "$text":{"$search":word}}).count()
+            count = self.coll.find({"Year":year, "$text":{"$search":content}}).count()
             te.append({"year":year, "count":count})
-            count = self.coll.find({"Year":year, "Author Keywords":{"$all":words}}).count()
+            count = self.coll.find({"Year":year, "Author Keywords":{"$all":contents}}).count()
             kw.append({"year":year, "count":count})
             
         return {"text":te, "keyword":kw}
+    """
 
-    def searchRiver(self, words, qtype):
-        words = words.lower()
-        wordlist = [w.strip() for w in words.split(",")]
+    def searchFreq(self, content, qtype, oc):
+        content = content.lower()
+        contentlist = [w.strip() for w in content.split(",")]
         res = []
+
         for year in range(self.startYear, self.endYear+1):
-            ent = {"year":year}
-            for word in wordlist:
-                words = word.split(' ')
-                if(int(qtype)==1):
-                    count = self.coll.find({"Year":year, "Author Keywords":{"$all":words}}).count()
+            #ent = {"year":year}
+            #for c in contentlist:
+            #    if(qtype==oc.keywords_te):
+            #        count = self.coll.find(self.__byKeywords(year, c)).count()
+            #    else:
+            #        count = self.coll.find(self.__byText(year, c)).count()
+
+            #    ent[c] = count 
+            #    
+            #res.append(ent)
+
+            for c in contentlist:
+                ent = {"year":year}
+                if(qtype==oc.keywords_te):
+                    count = self.coll.find(self.__byKeywords(year, c)).count()
                 else:
-                    count = self.coll.find({"Year":year, "$text":{"$search":word}}).count()
+                    count = self.coll.find(self.__byText(year, c)).count()
 
-                ent[word] = count 
+                ent["key"] = c 
+                ent["count"] = count
                 
-            res.append(ent)
-        return {"data":res, "keys":wordlist, "qtype":qtype} 
+                res.append(ent)
+ 
+        return {"data":res, "keys":contentlist, "qtype":qtype} 
 
-    #def searchList(self, key, year, fields,  qtype):
-    def searchList(self, meta):
+
+
+
+    def searchCited(self, content, qtype, oc):
+        res = {}
+        found = 0
+        confs = {}
+        for year in range(self.startYear, self.endYear+1):
+            if(qtype==oc.keywords_te):
+                found = self.coll.find(self.__byKeywords(year, content))
+            else:
+                found = self.coll.find(self.__byText(year, content))
+            res[year] = {};
+
+            for ent in found:
+                if(not isinstance(ent["Conference"], basestring)):
+                    continue;
+                res[year][ent["Conference"]] = res[year].get(ent["Conference"], 0)+ent["CiteCount"];
+                confs[ent["Conference"]] = 1;
+
+        res_arr = []
+
+        for year, val in res.items():
+            for conf, count in val.items():
+                res_arr.append({"year":year, "key":conf, "count":count})
+
+        return {"data":res_arr, "keys": confs.keys(), "qtype": qtype};
+
+    def searchList(self, meta, oc):
         fields = meta["fields"]
         qtype = meta["qtype"]
         data = meta["data"]
@@ -69,7 +107,7 @@ class MDB(object):
         key = data["key"]
         condition = {"Year": int(year)}
 
-        if(int(qtype)==1):
+        if(qtype==oc.keywords_te):
             condition["Author Keywords"] = {"$all":[key]} 
         else:
             condition["$text"] = {"$search":key}
@@ -86,34 +124,4 @@ class MDB(object):
             res.append(v)
             
         return res
-
-    def searchHeat(self, key, qtype):
-        res = {}
-        found = 0
-        words = key.split(",");
-        confs = {}
-        for year in range(self.startYear, self.endYear+1):
-            if(int(qtype)==1):
-                found = self.coll.find({"Year":year, "Author Keywords":{"$all":words}})
-            else:
-                found = self.coll.find({"Year":year, "$text":{"$search":key}})
-            res[year] = {};
-
-            for ent in found:
-                if(not isinstance(ent["Conference"], basestring)):
-                    continue;
-                res[year][ent["Conference"]] = res[year].get(ent["Conference"], 0)+ent["CiteCount"];
-                confs[ent["Conference"]] = 1;
-
-
-        res_arr = []
-
-        for year, val in res.items():
-            for conf, count in val.items():
-                res_arr.append({"year":year, "conf":conf, "citeCount":count})
-
-        return {"data":res_arr, "key": key};
-        #return {"confs":confs, "data":res_arr};
-
-    #return res
 

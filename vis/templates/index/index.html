@@ -107,31 +107,31 @@
 
             <div class="collapse navbar-collapse">
 
+                {% for options in navOptions%}
                 <div class="dropdown navbar-form navbar-left ">
-                    <button class="btn btn-default dropdown-toggle" style="width:110px" type="button" id="dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    <span id="dropdownLabel">
-		    River Chart
+                    <span class="olabel" targ="{{options.label}}">
+                        {{options.label}}:
+                    </span>
+                    <button class="btn btn-default dropdown-toggle" style="" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span class="dropdownLabel">
+                        {{options.options.0}}
                     </span>
 		    <span class="caret"></span>
 		  </button>
 		  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-		    <li><a class="btn-chart-type" targ="river" href="#">River Chart</a></li>
-		    <li><a class="btn-chart-type" targ="line"  href="#">Line Chart</a></li>
-		    <li><a class="btn-chart-type" targ="heat"  href="#">Heat Map</a></li>
+                    {% for o in options.options%}
+                    <li><a class="btn-option" targ="" href="#">{{o}}</a></li>
+                    {% endfor %}
 		  </ul>
 		</div>
+                {% endfor %}
 
                 <div class="navbar-form navbar-left">
-                    <div id="chkbox" class="radio">
-                         <label>
-                           <input id="chkKw" type="radio" name="qtype" checked="true"> Author Keywords
-                         </label>
-                         <label>
-                           <input id="chkAb" type="radio" name="qtype"> Abstract
-                         </label>
-                    </div>
-                    <div class="btn-group">
-                        <input id="inpt-inpage-search" class="form-control" placeholder="Search">
+                   <div class="input-group">
+                        <input id="inpt-search" class="form-control" placeholder="Search">
+                        <span class="input-group-btn">
+                            <button id="btn-search" class="btn btn-default">search</button>
+                        </span>
                     </div>
                 </div>
 
@@ -142,13 +142,14 @@
     </nav>
 
     <div id="container">
-        <div id="lineChart"></div>
-        <div id="riverChart"></div>
-        <div id="heatChart"></div>
+        <div class="dvChart" id="lineChart"></div>
+        <div class="dvChart" id="riverChart"></div>
+        <div class="dvChart" id="heatChart"></div>
    </div>
 
    <div id="searchList">
    </div>
+
  
 
 
@@ -165,5 +166,11 @@
 <script src="{% static 'js/heatchart.js' %}"></script>
 <script src="{% static 'js/riverchart.js' %}"></script>
 <script src="{% static 'js/mjs.js' %}"></script>
+
+
+<script>
+var ddata = {{jsonstr | safe}}
+initWidget(ddata.navOptions);
+</script>
 
 </html>

@@ -6,9 +6,10 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 
 from . import mdb
-
 from django.views.decorators.csrf import csrf_exempt
 import json
+
+from index.views import OptionConfig 
 
 @csrf_exempt 
 def searchLine(request):
@@ -33,18 +34,6 @@ def searchRiver(request):
         );
     return "ERROR!!!!!"
 
-@csrf_exempt 
-def searchList(request):
-    if request.method == "POST":
-        mdb_hand = mdb.MDB()
-        req = json.loads(request.POST.get('dataStr'))
-        data = mdb_hand.searchList(req)
-        return HttpResponse(
-            json.dumps(data),
-            content_type="application/json"
-        );
-    return "ERROR!!!!!"
-
 
 @csrf_exempt 
 def searchHeat(request):
@@ -58,4 +47,36 @@ def searchHeat(request):
         #    content_type="application/json"
         #);
     return "ERROR!!!!!"
+
+@csrf_exempt 
+def searchList(request):
+    if request.method != "POST":
+        return "ERROR!!!!!"
+    oc = OptionConfig()
+    mdb_hand = mdb.MDB()
+    meta = json.loads(request.POST.get('metaStr'))
+    data = mdb_hand.searchList(meta, oc)
+    return HttpResponse(
+        json.dumps(data),
+        content_type="application/json"
+    );
+    #return JsonResponse(data)
+
+@csrf_exempt 
+def search(request):
+    if request.method != "POST":
+        return "ERROR!!!!!"
+
+    oc = OptionConfig()
+    mdb_hand = mdb.MDB()
+    content = request.POST.get('content') 
+    options = json.loads(request.POST.get('options'))
+    qtype = options["Search With"]
+
+    if(options["Criterion"]==oc.cited_te):
+        data = mdb_hand.searchCited(content, qtype, oc)
+    else:
+        data = mdb_hand.searchFreq(content, qtype, oc)
+    #return JsonResponse({"res":"ok"})
+    return JsonResponse(data)
 

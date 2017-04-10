@@ -5,10 +5,11 @@ function aalert(data)
 
 var server_ip = "127.0.0.1"
 var port = "8000"
-var searchLine_url = "/search/line/"
-var searchRiver_url = "/search/river/"
+//var searchLine_url = "/search/line/"
+//var searchRiver_url = "/search/river/"
+//var searchHeat_url = "/search/heat/"
+var search_url = "/search/n/"
 var searchList_url = "/search/list/"
-var searchHeat_url = "/search/heat/"
 
 var listFields = ["Paper Title","Author Names", "Year", "CiteCount", "Link" ]
 
@@ -54,20 +55,34 @@ function searchList(data)
 {
     var meta = {"data":data};
     meta["fields"] =  listFields.join(",");
-    meta["qtype"] = qtype;
-    sendAndGet({"dataStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
+    meta["qtype"] = optionChosen["Search With"];
+    sendAndGet({"metaStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
 }
 
 
 
 function presentLineChart(data)
 {
+    $(".dvChart").hide();
+    $("#lineChart").show();
     lineChart.present(data);
 }
 
 function presentRiverChart(data)
 {
+    console.log(JSON.stringify(data))
+    $(".dvChart").hide();
+    $("#riverChart").show();
     riverChart.present(data);
+}
+
+function presentHeatChart(data)
+{
+
+    console.log(JSON.stringify(data))
+    $(".dvChart").hide();
+    $("#heatChart").show();
+    heatChart.present(data);
 }
 
 function presentList(data)
@@ -115,101 +130,63 @@ function tabulate(data, c0)
     return table;
 }
 
-function presentHeatChart(data)
+function makeSearch()
 {
-    heatChart.present(data);
+    let text = $("#inpt-search").val();
+    if(text=="")
+        text = "lighting, texture, material, shadow";
+    let data = {"content": text, "options": JSON.stringify(optionChosen)};
+    let callback;
+    if(optionChosen["Chart Type"] == "River")
+        callback = presentRiverChart;
+    else if(optionChosen["Chart Type"] == "Line")
+        callback = presentLineChart;
+    else
+        callback = presentHeatChart;
+    sendAndGet(data, search_url, "POST", callback);
 }
-
-var qtype = 0;
 
 function checkKey(event)
 {
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if(keycode == 13)
     {
-        var text = $("#inpt-inpage-search").val();
-        if(text=="")
-            text = "lighting, texture, material, shadow";
-
-        var chkKw = document.getElementById('chkKw').checked;
-        var chkAb = document.getElementById('chkAb').checked;
-        if(chkKw)
-            qtype = 1;
-        else
-            qtype = 2;
-
-
-        if(curFlag == "line")
-            sendAndGet({"content":text}, searchLine_url,"POST",presentLineChart);
-        else if(curFlag == "river")
-            sendAndGet({"content":text, "qtype":qtype}, searchRiver_url,"POST",presentRiverChart);
-        else if(curFlag == "heat")
-            sendAndGet({"content":text, "qtype":qtype}, searchHeat_url,"POST",presentHeatChart);
+        makeSearch();
     }
 }
 
-$("#lineChartSvg").hide(); 
-$("#inpt-inpage-search").keydown(function(e){checkKey(e);});
+var optionChosen = {};
+var riverChart, lineChart, heatChart;
 
-var lineChart = new LineChart("lineChart");
-var riverChart = new RiverChart("riverChart");
-var heatChart = new HeatChart("heatChart");
+function initWidget(navOptions)
+{
 
-var curFlag = "river";
+    navOptions.forEach(function(e){
+        optionChosen[e.label] = e.options[0];
+    });
 
-$(".btn-chart-type").click(function(e){
-    e.preventDefault();
+    $("#inpt-search").keydown(function(e){checkKey(e);});
+    $("#btn-search").click(makeSearch);
+    
+    lineChart = new LineChart("lineChart");
+    riverChart = new RiverChart("riverChart");
+    heatChart = new HeatChart("heatChart");
+    
+    $(".btn-option").click(function(e){
+        e.preventDefault();
+    
+        tooltip.html("");
+    
+        let outer = $(this).parent().parent().parent();
+        let text = $(this).text();
+        outer.find(".dropdownLabel").text(text);
+        let label = outer.find(".olabel").attr("targ");
+        optionChosen[label] = text;
 
-    tooltip.html("");
+    });
+    
+    $("html, body").animate({ scrollTop: 0}, 200); 
+    
+    $(".dvChart").hide();
+}
 
-    $("#dropdownLabel").text($(this).text());
-    curFlag = $(this).attr("targ");
-
-    if(curFlag=="line")
-    {
-        $("#lineChart").show(); 
-        $("#riverChart").hide(); 
-        $("#heatChart").hide(); 
-        $("#chkbox").hide();
-    }
-    else if(curFlag == "river")
-    {
-        $("#lineChart").hide(); 
-        $("#riverChart").show(); 
-        $("#heatChart").hide(); 
-        $("#chkbox").show();
-    }
-    else if(curFlag == "heat")
-    {
-        $("#lineChart").hide(); 
-        $("#riverChart").hide(); 
-        $("#heatChart").show(); 
-        $("#chkbox").show();
-    }
-});
-
-$("html, body").animate({ scrollTop: 0}, 200); 
-
-
-$("#lineChart").hide(); 
-$("#riverChart").show(); 
-$("#heatChart").hide(); 
-$("#chkbox").show();
-
-var data = [
-    [300,200,5],
-    [300,230,14],
-    [330,215,10],
-]
-
-//var heat = simpleheat('canvasHeat').data(data).max(18).radius(40,15);
-//
-//function draw() {
-//    heat.draw();
-//}
-//
-//heat.mixMode("superimposed");
-//
-//draw();
-//
-//
