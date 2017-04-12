@@ -205,6 +205,6 @@ function initWidget(navOptions)
     $(".dvChart").hide();
 
     $("#btn-usage").click(function(){$("#dvUsage").toggle()});
-    $("#dvUsage").click(function(){$("#dvUsage").hide()});
+    $("#dvUsageClick").click(function(){$("#dvUsage").hide()});
 }
 
