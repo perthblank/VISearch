@@ -1,6 +1,13 @@
 <html>
 <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    {% load static %}
+    {% block head %}
+      <link href="{% static 'css/enhance.css' %}" rel="stylesheet">
+      <link href="{% static 'css/vender/bootstrap.min.css' %}" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    {% endblock head %}
+
+
     <style>
         .form-control:focus {
             border: 1px #222087 solid;
@@ -33,7 +40,7 @@
         #searchList {
             border-top:3px solid #DDDDDD;
             overflow-y: scroll;
-            margin-top:40%;
+            margin-top:44%;
             position:absolute;
             background-color:white;
             max-height:100%;
@@ -42,21 +49,13 @@
             background-color: #F0F0F0;
             z-index:22;
         }
-        #right-img {
-            width: 130px;
-        }
-        #btn-find-path,
-        .ext-choice,
-        .ext-choice-cat {
-            display: none;
-        }
         li a {
             cursor: pointer;
         }
-
         #lineChart,
         #riverChart,
         #heatChart
+        #description
         {
             position: fixed;
             left: 0px;
@@ -65,14 +64,15 @@
             bottom: 0px;
         }
 
+
+        #description
+        {
+            padding:100px;
+        }
+
     </style>
 
 </head>
-    {% load static %}
-    {% block head %}
-      <link href="{% static 'css/enhance.css' %}" rel="stylesheet">
-    {% endblock head %}
-
 
 <body>
     <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -141,32 +141,55 @@
         <!-- /.container-fluid -->
     </nav>
 
+        <div id="description">
+            
+            <h3>Usage</h3>
+            <ul>
+                <li>Select <b>Chart Type</b> </li>
+                <li>Select <b>Search From</b> to decide where should the searching words appear: in Author Keywords or Abstract & Title </li>
+                <li>Select <b>Criterion</b> to decide the aggregate criterion:  
+                    <ul>
+                        <li><b>Frequency</b> counts the how many papers that contain the words in selected criterion
+                            this can support mutiple keywords seperated by ',', for exapmple, search 'lighting, spatial selection, texture, material'</li>
+                        <li><b>Cited Times</b> count the how many times the papers are cited that contain the word in selected criterion
+                            group by conferences, support single keyword</li>
+                    </ul>
+                </li>
+                <li>Select <b>Group By</b> to decide the group mode:  
+                    <ul>
+                        <li><b>Multiple Words</b> 
+                            support mutiple keywords when search,  seperated by ','. For exapmple, search 'lighting, spatial selection, texture, material'</li>
+                        <li><b>Cited Times</b> 
+                            group by conferences, support single keyword</li>
+                    </ul>
+            </ul>
+
+        </div> 
+
     <div id="container">
         <div class="dvChart" id="lineChart"></div>
         <div class="dvChart" id="riverChart"></div>
         <div class="dvChart" id="heatChart"></div>
+
    </div>
 
    <div id="searchList">
    </div>
 
- 
-
-
 </body>
     
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script
-  src="https://code.jquery.com/jquery-3.1.1.min.js"
+<script src="{% static 'js/vender/d3.v4.min.js' %}"></script>
+<script src="{% static 'js/vender/jquery-3.1.1.min.js' %}"
     integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-      crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
+<script src="{% static 'js/vender/bootstrap.min.js' %}"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+    crossorigin="anonymous"></script>
 <script src="{% static 'js/vischart.js' %}"></script>
 <script src="{% static 'js/heatchart.js' %}"></script>
 <script src="{% static 'js/riverchart.js' %}"></script>
 <script src="{% static 'js/mjs.js' %}"></script>
-
 
 <script>
 var ddata = {{jsonstr | safe}}

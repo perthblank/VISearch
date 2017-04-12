@@ -42,17 +42,6 @@ class MDB(object):
         res = []
 
         for year in range(self.startYear, self.endYear+1):
-            #ent = {"year":year}
-            #for c in contentlist:
-            #    if(qtype==oc.keywords_te):
-            #        count = self.coll.find(self.__byKeywords(year, c)).count()
-            #    else:
-            #        count = self.coll.find(self.__byText(year, c)).count()
-
-            #    ent[c] = count 
-            #    
-            #res.append(ent)
-
             for c in contentlist:
                 ent = {"year":year}
                 if(qtype==oc.keywords_te):
@@ -62,12 +51,9 @@ class MDB(object):
 
                 ent["key"] = c 
                 ent["count"] = count
-                
                 res.append(ent)
- 
-        return {"data":res, "keys":contentlist, "qtype":qtype} 
 
-
+        return {"data":res, "keys":contentlist, "qtype":qtype, "search": ""} 
 
 
     def searchCited(self, content, qtype, oc):
@@ -93,7 +79,7 @@ class MDB(object):
             for conf, count in val.items():
                 res_arr.append({"year":year, "key":conf, "count":count})
 
-        return {"data":res_arr, "keys": confs.keys(), "qtype": qtype};
+        return {"data":res_arr, "keys": confs.keys(), "qtype": qtype, "search": content};
 
     def searchList(self, meta, oc):
         fields = meta["fields"]
@@ -103,7 +89,7 @@ class MDB(object):
     	res = []
         found = 0
         fields = fields.split(",")
-        year = data["Year"]
+        year = data["year"]
         key = data["key"]
         condition = {"Year": int(year)}
 
@@ -113,7 +99,7 @@ class MDB(object):
             condition["$text"] = {"$search":key}
 
         if "Conference" in data:
-            condition["Conference"] = data["Conference"]
+            condition["Conference"] = data["conference"]
 
         found = self.coll.find(condition)
 

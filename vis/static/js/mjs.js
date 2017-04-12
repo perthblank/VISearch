@@ -55,7 +55,7 @@ function searchList(data)
 {
     var meta = {"data":data};
     meta["fields"] =  listFields.join(",");
-    meta["qtype"] = optionChosen["Search With"];
+    meta["qtype"] = optionChosen["Search From"];
     sendAndGet({"metaStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
 }
 
@@ -78,8 +78,6 @@ function presentRiverChart(data)
 
 function presentHeatChart(data)
 {
-
-    console.log(JSON.stringify(data))
     $(".dvChart").hide();
     $("#heatChart").show();
     heatChart.present(data);

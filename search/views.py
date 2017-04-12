@@ -34,19 +34,18 @@ def searchRiver(request):
         );
     return "ERROR!!!!!"
 
-
-@csrf_exempt 
-def searchHeat(request):
-    if request.method == "POST":
-        mdb_hand = mdb.MDB()
-        data = mdb_hand.searchHeat(request.POST.get('content'), request.POST.get('qtype'))
-        #print data
-        return JsonResponse(data);
-        #return HttpResponse(
-        #    json.dumps(data),
-        #    content_type="application/json"
-        #);
-    return "ERROR!!!!!"
+#@csrf_exempt 
+#def searchHeat(request):
+#    if request.method == "POST":
+#        mdb_hand = mdb.MDB()
+#        data = mdb_hand.searchHeat(request.POST.get('content'), request.POST.get('qtype'))
+#        #print data
+#        return JsonResponse(data);
+#        #return HttpResponse(
+#        #    json.dumps(data),
+#        #    content_type="application/json"
+#        #);
+#    return "ERROR!!!!!"
 
 @csrf_exempt 
 def searchList(request):
@@ -71,12 +70,12 @@ def search(request):
     mdb_hand = mdb.MDB()
     content = request.POST.get('content') 
     options = json.loads(request.POST.get('options'))
-    qtype = options["Search With"]
+    qtype = options["Search From"]
 
     if(options["Criterion"]==oc.cited_te):
         data = mdb_hand.searchCited(content, qtype, oc)
     else:
         data = mdb_hand.searchFreq(content, qtype, oc)
-    #return JsonResponse({"res":"ok"})
+    data["criterion"] = options["Criterion"];
     return JsonResponse(data)
 

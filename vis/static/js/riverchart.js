@@ -6,11 +6,50 @@ class RiverChart
         this.parentID = parentID;
     }
 
+    convertToRiverData(meta)
+    {
+        var keys = meta.keys;
+        var data = meta.data;
+
+        var ndata = [];
+        var curyear = 1990-1;
+        data.forEach(function(e){
+            while(curyear<e.year)
+            {
+                curyear += 1;
+                var ob = {};
+                keys.forEach(function(k){
+                    ob[k] = 0;
+                });
+                ob["year"] = curyear;
+                ndata.push(ob);
+            }
+            ndata[ndata.length-1][e.key] += +e.count;
+        });
+
+        while(curyear<2015)
+        {
+            var ob = {};
+            curyear += 1;
+            keys.forEach(function(k){
+                ob[k] = 0;
+            });
+            ob["year"] = curyear;
+            ndata.push(ob);
+        }
+
+        meta.data = ndata;
+        return meta;
+    }
+
     present(meta)
     {
+        meta = this.convertToRiverData(meta);
         d3.select("#"+this.parentID).selectAll("*").remove();
-        var keys = meta["keys"];
-        var data = meta["data"];
+        var keys = meta.keys;
+        var data = meta.data;
+        var criterion = meta.criterion;
+        var searchKey = meta.search;
         var svg = d3.select("#"+this.parentID).append("svg"),
             margin = {top: 20, right: 20, bottom: 30, left: 50};
 
@@ -30,9 +69,6 @@ class RiverChart
 
         data.forEach(function(e){
             e.date = parseDate(e["year"]);
-            //keys.forEach(function(k){
-            //    e[k] = e[k]
-            //});
         });
         
         var x = d3.scaleTime().range([0, width]),
@@ -97,18 +133,36 @@ class RiverChart
             var mousex = d3.mouse(this);
             mousex = mousex[0]+20;
             var offset = Math.round(x.invert(mousex).getYear()-90);
-	    var val = (d[offset][1]-d[offset][0]);
-            tooltip.html(
-                    "<p>keyword: " + d.key + 
-                    "<br/>year: " + (offset+1990) + 
-                    "<br/>" + val + " papers(s)</p>" ).style("visibility", "visible");
+	    var count = (d[offset][1]-d[offset][0]);
+            var year = offset+1990;
+            var html = "";
+
+            if(criterion == "Cited Time")
+            {
+                html = "<p> key word: " +searchKey + 
+                "<br/>conference: " + d.key +
+                "<br/>year: " + year +  
+                "<br/>cited " + count + " times(s)</p>" 
+            }
+            else
+            {
+                html = "<p> key word: " +d.key + 
+                "<br/>year: " + year +  
+                "<br/>appeared in " + count + " paper(s)</p>" 
+            }
+            tooltip.html(html).style("visibility", "visible");
+
+            //tooltip.html(
+            //        "<p>keyword: " + d.key + 
+            //        "<br/>year: " + (offset+1990) + 
+            //        "<br/>" + val + " papers(s)</p>" ).style("visibility", "visible");
    	}).on("click",function(d,i){
 
             var mousex = d3.mouse(this);
             mousex = mousex[0]+20;
             var offset = Math.round(x.invert(mousex).getYear()-90);
             var year = offset+1990;
-            searchList({"key": d.key, "Year":year});
+            searchList({"key": d.key, "year":year});
             d3.event.stopPropagation();
         });
 

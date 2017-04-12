@@ -18,16 +18,49 @@ class HeatChart extends VisChart
         {
             this.init(meta);
             this.inited = true;
+            console.log("init heat")
         }
 
-        this.update(meta.data, meta.key);
+        this.update(meta);
     }
 
-    update(data, currentKey)
+    update(meta)
     {
+        var data = meta.data;
+        var searchKey = meta.search;
+        var keys = meta.keys;
         var circles = this.g.selectAll(".dot").data(data);
         var svg = this.svg;
         var x = this.x;
+
+        var keysY = [];
+        if(keys.length==1)
+        {
+            keysY = [this.gHeight*0.5]; 
+        }
+        else
+        {
+            for(var i = 0; i<keys.length; ++i)
+            {
+                keysY.push(this.gHeight*(0.95-(0.9)/(keys.length-1)*i));
+            }
+        }
+
+        var yValue = function(d) { return d.key;}, 
+            y = d3.scaleOrdinal()
+                     .domain(keys)
+                     .range(keysY);
+
+        var yMap = function(d) { return y(yValue(d));};
+
+        this.y = y;
+        this.yMap = yMap;
+
+        svg.selectAll(".y-axis").remove();
+        this.g.append("g").attr("class", ".y-axis")
+            .call(d3.axisLeft(y));
+
+        var criterion = meta.criterion;
 
         circles.enter().append("circle")
             .attr("class", "dot")
@@ -45,17 +78,29 @@ class HeatChart extends VisChart
                 .attr("opacity", "1"); 
 
             }).on("mousemove", function(d, i) {
-                var year = (d3.timeFormat("%Y")(d.year))
-                tooltip.html(
-                        "<p> key word: " +currentKey + 
-                        "<br/>conference: " + d.key +
-                        "<br/>year: " + year +  
-                        "<br/>cited " + d.count + " times(s)</p>" ).style("visibility", "visible");
-
+                var year = (d3.timeFormat("%Y")(d.year));
+                var html  = "";
+                if(criterion == "Cited Time")
+                {
+                    html = "<p> key word: " +searchKey + 
+                    "<br/>conference: " + d.key +
+                    "<br/>year: " + year +  
+                    "<br/>cited " + d.count + " times(s)</p>" 
+                }
+                else
+                {
+                    html = "<p> key word: " +d.key + 
+                    "<br/>year: " + year +  
+                    "<br/>appeared in " + d.count + " paper(s)</p>" 
+                }
+                tooltip.html(html).style("visibility", "visible");
    	    }).on("click",function(d,i){
 
                 var year = (d3.timeFormat("%Y")(d.year))
-                searchList({"Conference": d.key, "Year": year, "key": currentKey});
+                if(criterion == "Cited Time")
+                    searchList({"conference": d.key, "year": year, "key": searchKey});
+                else
+                    searchList({"year": year, "key": d.key});
                 d3.event.stopPropagation();
             })
 
@@ -64,12 +109,12 @@ class HeatChart extends VisChart
             .attr("r", function(d){
                 if(d.count==0) 
                     return 0;
-                return Math.log(d.count)*3})
+                return Math.sqrt(d.count+1)*3})
+                //return (d.count+1)})
             .attr("cx", this.xMap)
             .attr("cy", this.yMap)
             .style("fill", function(d) 
                     { return "#bb3455";})
-
             .attr("opacity", 1)
 
         circles.exit().remove();
@@ -87,7 +132,6 @@ class HeatChart extends VisChart
         {
             keysY.push(this.gHeight*(0.95-(0.9)/(keys.length-1)*i));
         }
-        console.log(keysY)
         var data = meta.data;
 
         var xValue = function(d) { return d.year;},
@@ -97,11 +141,9 @@ class HeatChart extends VisChart
         var yValue = function(d) { return d.key;}, 
             y = d3.scaleOrdinal()
                      .domain(keys)
-                     //.domain(["vast",'infovis',"scivis","vis"])
-                     //.range([this.gHeight*0.95, this.gHeight*0.65, this.gHeight*0.35, this.gHeight*0.05]);
                      .range(keysY);
 
-            var yMap = function(d) { return y(yValue(d));};
+        //var yMap = function(d) { return y(yValue(d));};
         
         var tooltip = d3.select("body").append("div")
             .attr("class", "tooltip")
@@ -111,11 +153,11 @@ class HeatChart extends VisChart
         
         g.append("g")
             .attr("class",".y-axis")
-            .call(d3.axisLeft(y));
+            //.call(d3.axisLeft(y));
 
         this.y = y;
         this.xMap = xMap;
-        this.yMap = yMap;
+        //this.yMap = yMap;
 
         svg.on("click",function(){
             $("html, body").animate({ scrollTop: 0}, 200); 
