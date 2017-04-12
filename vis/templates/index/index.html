@@ -9,10 +9,11 @@
 
 
     <style>
+
         .form-control:focus {
             border: 1px #222087 solid;
             border-radius: 0px;
-            /*
+/*
     box-shadow: 0 0px 0px #222087 inset, 0 0 10px #d7d7d7;
     outline: 0 none;
 */
@@ -55,7 +56,6 @@
         #lineChart,
         #riverChart,
         #heatChart
-        #description
         {
             position: fixed;
             left: 0px;
@@ -64,10 +64,12 @@
             bottom: 0px;
         }
 
-
-        #description
+        #dvUsage
         {
+            position: fixed;
             padding:100px;
+            background-color: rgba(240,240,240,0.5);
+            z-index:22;
         }
 
     </style>
@@ -100,8 +102,10 @@
     <nav class="navbar navbar-default navbar-static-top">
         <div class="container-fluid">
             <div class="navbar-header" id="dvHeader">
+                <!--
                 <a class="navbar-brand" href="#">VISearch</a>
                 <div id="beta">
+                -->
                 </div>
             </div>
 
@@ -130,7 +134,8 @@
                    <div class="input-group">
                         <input id="inpt-search" class="form-control" placeholder="Search">
                         <span class="input-group-btn">
-                            <button id="btn-search" class="btn btn-default">search</button>
+                            <button id="btn-search" class="btn btn-default">&nbsp;<span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            <button id="btn-usage" class="btn btn-default">&nbsp;<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></button>
                         </span>
                     </div>
                 </div>
@@ -141,28 +146,30 @@
         <!-- /.container-fluid -->
     </nav>
 
-        <div id="description">
+        <div id="dvUsage">
             
             <h3>Usage</h3>
             <ul>
-                <li>Select <b>Chart Type</b> </li>
-                <li>Select <b>Search From</b> to decide where should the searching words appear: in Author Keywords or Abstract & Title </li>
-                <li>Select <b>Criterion</b> to decide the aggregate criterion:  
+                <li><b>Chart Type:</b> support river chart and heat chart</li>
+                <li><b>Search From:</b> where should the searching words appear: in Author Keywords or Abstract & Title </li>
+                <li> <b>Criterion:</b> the aggregate criterion:  
                     <ul>
-                        <li><b>Frequency</b> counts the how many papers that contain the words in selected criterion
-                            this can support mutiple keywords seperated by ',', for exapmple, search 'lighting, spatial selection, texture, material'</li>
-                        <li><b>Cited Times</b> count the how many times the papers are cited that contain the word in selected criterion
-                            group by conferences, support single keyword</li>
+                        <li><b>Frequency</b> counts the how many papers in the database that contain the search word(s) in 'search from' option.
+                        <li><b>Cited Times</b> count the how many times the papers are cited that contain the search word(s) in 'search from' option 
+                      </li>
                     </ul>
                 </li>
-                <li>Select <b>Group By</b> to decide the group mode:  
+                <li><b>Group By:</b> the group mode:  
                     <ul>
                         <li><b>Multiple Words</b> 
-                            support mutiple keywords when search,  seperated by ','. For exapmple, search 'lighting, spatial selection, texture, material'</li>
-                        <li><b>Cited Times</b> 
-                            group by conferences, support single keyword</li>
+                            supports mutiple keywords when search,  seperated by ','. For exapmple, search 'lighting, spatial selection, texture, material'</li>
+                        <li><b>Conferences</b> 
+                            supports only single keyword, while the results are grouped to four conferences: VIS, InfoVIS, SciVIS, VAST</li>
                     </ul>
             </ul>
+            <i>
+            click to hide
+            </i>
 
         </div> 
 

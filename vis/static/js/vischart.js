@@ -9,6 +9,39 @@ var tooltip = d3.select("body")
     .style("top", "80px")
     .style("right", "65px");
 
+function getTooltipHtml(criterion, groupby, dKey, searchKey, year, count)
+{
+    var html = "";
+    if(criterion == "Cited Time")
+    {
+        if(groupby == "Multiple Words")
+        {
+            html = "<p> key word: " +dKey;
+        }
+        else
+        {
+            html = "<p> key word: " +searchKey + 
+                "<br/>conference: " + dKey;
+        }
+        html += "<br/>year: " + year +  
+        "<br/>cited " + count + " times(s)</p>";
+    }
+    else
+    {
+        if(groupby == "Multiple Words")
+            html = "<p> key word: " +dKey;
+        else 
+        {
+            html = "<p> key word: " +searchKey + 
+            "<br/> conference: " +dKey;
+        }
+        html += "<br/>year: " + year +  
+        "<br/>appeared in " + count + " paper(s)</p>";
+    }
+
+    return html;
+}
+ 
 
 class VisChart
 {

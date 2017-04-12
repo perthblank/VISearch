@@ -36,7 +36,8 @@ class MDB(object):
         return {"text":te, "keyword":kw}
     """
 
-    def searchFreq(self, content, qtype, oc):
+    #def searchFreq(self, content, qtype, oc):
+    def groupbyMulti(self, content, qtype, criterion, oc):
         content = content.lower()
         contentlist = [w.strip() for w in content.split(",")]
         res = []
@@ -45,9 +46,16 @@ class MDB(object):
             for c in contentlist:
                 ent = {"year":year}
                 if(qtype==oc.keywords_te):
-                    count = self.coll.find(self.__byKeywords(year, c)).count()
+                    found = self.coll.find(self.__byKeywords(year, c))
                 else:
-                    count = self.coll.find(self.__byText(year, c)).count()
+                    found = self.coll.find(self.__byText(year, c))
+
+                if(criterion == oc.cited_te):
+                    count = 0;
+                    for f in found:
+                        count += f["CiteCount"]
+                else:
+                    count = found.count()
 
                 ent["key"] = c 
                 ent["count"] = count
@@ -56,9 +64,9 @@ class MDB(object):
         return {"data":res, "keys":contentlist, "qtype":qtype, "search": ""} 
 
 
-    def searchCited(self, content, qtype, oc):
+    #def searchCited(self, content, qtype, oc):
+    def groupbyConf(self, content, qtype, criterion, oc):
         res = {}
-        found = 0
         confs = {}
         for year in range(self.startYear, self.endYear+1):
             if(qtype==oc.keywords_te):
@@ -70,7 +78,10 @@ class MDB(object):
             for ent in found:
                 if(not isinstance(ent["Conference"], basestring)):
                     continue;
-                res[year][ent["Conference"]] = res[year].get(ent["Conference"], 0)+ent["CiteCount"];
+                if(criterion == oc.cited_te):
+                    res[year][ent["Conference"]] = res[year].get(ent["Conference"], 0)+ent["CiteCount"];
+                else:
+                    res[year][ent["Conference"]] = res[year].get(ent["Conference"], 0)+1;
                 confs[ent["Conference"]] = 1;
 
         res_arr = []
@@ -98,7 +109,7 @@ class MDB(object):
         else:
             condition["$text"] = {"$search":key}
 
-        if "Conference" in data:
+        if "conference" in data:
             condition["Conference"] = data["conference"]
 
         found = self.coll.find(condition)

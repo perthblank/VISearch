@@ -56,6 +56,7 @@ function searchList(data)
     var meta = {"data":data};
     meta["fields"] =  listFields.join(",");
     meta["qtype"] = optionChosen["Search From"];
+    //console.log(JSON.stringify(meta));
     sendAndGet({"metaStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
 }
 
@@ -70,7 +71,7 @@ function presentLineChart(data)
 
 function presentRiverChart(data)
 {
-    console.log(JSON.stringify(data))
+    //console.log(JSON.stringify(data))
     $(".dvChart").hide();
     $("#riverChart").show();
     riverChart.present(data);
@@ -133,15 +134,31 @@ function makeSearch()
     let text = $("#inpt-search").val();
     if(text=="")
         text = "lighting, texture, material, shadow";
+
+    if(optionChosen["Group By"]== "Conferences")
+    {
+        let n = text.split(',').length;
+        if(n >1)
+        {
+            alert("Conferences mode supports only single word (or phrase) search");
+            return;
+        }
+    }
+ 
+
+
     let data = {"content": text, "options": JSON.stringify(optionChosen)};
     let callback;
-    if(optionChosen["Chart Type"] == "River")
+    if(optionChosen["Chart Type"] == "River Chart")
         callback = presentRiverChart;
-    else if(optionChosen["Chart Type"] == "Line")
-        callback = presentLineChart;
-    else
+    else if(optionChosen["Chart Type"] == "Heat Chart")
         callback = presentHeatChart;
+    else
+        console.log("no chart");
     sendAndGet(data, search_url, "POST", callback);
+
+
+    $("#dvUsage").hide();
 }
 
 function checkKey(event)
@@ -186,5 +203,8 @@ function initWidget(navOptions)
     $("html, body").animate({ scrollTop: 0}, 200); 
     
     $(".dvChart").hide();
+
+    $("#btn-usage").click(function(){$("#dvUsage").toggle()});
+    $("#dvUsage").click(function(){$("#dvUsage").hide()});
 }
 

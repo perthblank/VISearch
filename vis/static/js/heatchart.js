@@ -56,11 +56,11 @@ class HeatChart extends VisChart
         this.y = y;
         this.yMap = yMap;
 
-        svg.selectAll(".y-axis").remove();
-        this.g.append("g").attr("class", ".y-axis")
+        this.g.selectAll(".y-axis")
             .call(d3.axisLeft(y));
 
         var criterion = meta.criterion;
+        var groupby = meta.groupby;
 
         circles.enter().append("circle")
             .attr("class", "dot")
@@ -79,6 +79,8 @@ class HeatChart extends VisChart
 
             }).on("mousemove", function(d, i) {
                 var year = (d3.timeFormat("%Y")(d.year));
+                var html = getTooltipHtml(criterion, groupby, d.key, searchKey, year, d.count);
+                /*
                 var html  = "";
                 if(criterion == "Cited Time")
                 {
@@ -93,11 +95,12 @@ class HeatChart extends VisChart
                     "<br/>year: " + year +  
                     "<br/>appeared in " + d.count + " paper(s)</p>" 
                 }
+                */
                 tooltip.html(html).style("visibility", "visible");
    	    }).on("click",function(d,i){
 
                 var year = (d3.timeFormat("%Y")(d.year))
-                if(criterion == "Cited Time")
+                if(groupby=="Conferences")
                     searchList({"conference": d.key, "year": year, "key": searchKey});
                 else
                     searchList({"year": year, "key": d.key});
@@ -152,7 +155,7 @@ class HeatChart extends VisChart
         var parseDate = d3.timeParse("%Y");
         
         g.append("g")
-            .attr("class",".y-axis")
+            .attr("class","y-axis")
             //.call(d3.axisLeft(y));
 
         this.y = y;

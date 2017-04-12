@@ -71,11 +71,17 @@ def search(request):
     content = request.POST.get('content') 
     options = json.loads(request.POST.get('options'))
     qtype = options["Search From"]
+    groupby = options["Group By"]
+    criterion = options["Criterion"]
 
-    if(options["Criterion"]==oc.cited_te):
-        data = mdb_hand.searchCited(content, qtype, oc)
+    if(groupby == oc.conf_te):
+        data = mdb_hand.groupbyConf(content, qtype, criterion, oc)
     else:
-        data = mdb_hand.searchFreq(content, qtype, oc)
-    data["criterion"] = options["Criterion"];
+        data = mdb_hand.groupbyMulti(content, qtype, criterion, oc)
+
+    data["criterion"] = criterion;
+    data["groupby"] = groupby;
+
     return JsonResponse(data)
+
 
