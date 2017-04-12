@@ -103,9 +103,10 @@ class MDB(object):
         year = data["year"]
         key = data["key"]
         condition = {"Year": int(year)}
+        keyArr = key.split(" ");
 
         if(qtype==oc.keywords_te):
-            condition["Author Keywords"] = {"$all":[key]} 
+            condition["Author Keywords"] = {"$all":keyArr} 
         else:
             condition["$text"] = {"$search":key}
 
