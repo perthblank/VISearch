@@ -1,39 +1,19 @@
-
 # coding: utf-8
 
-# In[ ]:
+print "prepare..."
 
 import pandas as pd
-import numpy as np
 import re
-import math
-import copy
 import pymongo
-import pprint
-
-
-# In[ ]:
-
-dataFile = "./data.xlsx"
-dbIP = "127.0.0.1"
-dbPort = 27017
-dbCollection = "main"
-
-
-# In[ ]:
+from vconfig import *
 
 #get data from excel file
 xl = pd.ExcelFile(dataFile)
 df0 = xl.parse("Main dataset")
-#print xl.sheet_names
-#print df0.columns
 criteria = ["Year","Paper Title", "Abstract", 
             "Author Keywords", "Author Names", "References", "Conference", "Link", "Paper DOI"]
 tosplit = ["Author Keywords"]
 df = df0.loc[:,criteria]
-
-
-# In[ ]:
 
 #get the cited times of each paper
 refcount = {}
@@ -44,9 +24,6 @@ for i, row in df.iterrows():
     for r in refs:
         refcount[r] = refcount.get(r, 0)+1;
         
-
-
-# In[ ]:
 
 #define mdb class
 class MDB(object):
@@ -59,16 +36,6 @@ class MDB(object):
         self.db = self.client.vis
         self.coll = self.db[self.cname]
     
-    def search(self, word):
-        if(word==""):
-            return {}
-        word = word.lower()
-        kw = self.coll.find({"Author Keywords":{"$in":[word]}})
-        te = self.coll.find({"$text":{"$search":word}})
-        
-        print "from keyword: ", kw.count()
-        print "from abstract & title: ", te.count()
-        
     def insert(self, df):
         for i, data in df.iterrows():
             ent = {}
@@ -88,21 +55,23 @@ class MDB(object):
             self.coll.insert_one(ent)
             
     def createTextIndex(self):
-        self.coll.create_index([("Abstract", pymongo.TEXT)])
+        self.coll.create_index([("Abstract", pymongo.TEXT), ("Paper Title", pymongo.TEXT)])
         """
         db.main.createIndex({Abstract:"text","Paper Title":"text"})
         """
         
 
 
-# In[ ]:
-
 mdb = MDB()
+
+print "insert data..."
 mdb.insert(df)
+
+
+print "create index..."
 mdb.createTextIndex();
 
+print "test..."
+mdb.coll.find_one({"Year":1995, "$text":{"$search":"geographic"}})
 
-#test
-mdb.coll.find_one({"Year":1995})
-
-
+print "ok"

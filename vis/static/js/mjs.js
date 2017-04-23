@@ -56,7 +56,7 @@ function searchList(data)
     var meta = {"data":data};
     meta["fields"] =  listFields.join(",");
     meta["qtype"] = optionChosen["Search From"];
-    console.log(JSON.stringify(meta));
+    //console.log(JSON.stringify(meta));
     sendAndGet({"metaStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
 }
 
