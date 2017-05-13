@@ -3,6 +3,12 @@ Visualization system based on [VIS Pub Data](http://www.vispubdata.org/site/visp
 
 Demo at: http://35.164.45.239:8000/
 
+### Features
+1. Different Chart Types
+1. Customizable Search Options
+1. Paper List
+1. Text Cloud
+
 ### Easy deployment
 #### Prepare Data
 1. Install mongodb and django on the server
@@ -13,4 +19,4 @@ Demo at: http://35.164.45.239:8000/
 1. Enter main folder, run `python manage.py runserver 0.0.0.0:8000`
 
 #### Test
-To test the application, open the page in browser, select the search input and press *Enter*, this will give you a default testing visualization
+Press *Enter* button on the search input. This will give you a default testing visualization on "lighting, texture, material, shadow"
