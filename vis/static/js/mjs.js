@@ -5,11 +5,9 @@ function aalert(data)
 
 var server_ip = "127.0.0.1"
 var port = "8000"
-//var searchLine_url = "/search/line/"
-//var searchRiver_url = "/search/river/"
-//var searchHeat_url = "/search/heat/"
 var search_url = "/search/n/"
 var searchList_url = "/search/list/"
+var searchCloud_url = "/search/cloud/"
 
 var listFields = ["Paper Title","Author Names", "Year", "CiteCount", "Link" ]
 
@@ -50,18 +48,6 @@ function sendAndGet(data, url, type, callback, arg)
     });
 }
 
-
-function searchList(data)
-{
-    var meta = {"data":data};
-    meta["fields"] =  listFields.join(",");
-    meta["qtype"] = optionChosen["Search From"];
-    //console.log(JSON.stringify(meta));
-    sendAndGet({"metaStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
-}
-
-
-
 function presentLineChart(data)
 {
     $(".dvChart").hide();
@@ -71,7 +57,6 @@ function presentLineChart(data)
 
 function presentRiverChart(data)
 {
-    //console.log(JSON.stringify(data))
     $(".dvChart").hide();
     $("#riverChart").show();
     riverChart.present(data);
@@ -84,12 +69,53 @@ function presentHeatChart(data)
     heatChart.present(data);
 }
 
-function presentList(data)
+function searchList(query)
 {
+    var meta = {"query":query};
+    meta["fields"] =  listFields.join(",");
+    meta["qtype"] = optionChosen["Search From"];
+    sendAndGet({"metaStr": JSON.stringify(meta)}, searchList_url,"POST",presentList);
+}
+
+function presentList(res)
+{
+    var data = res["res"];
+    var metaStr = res["metaStr"];
+
     data.sort(function(a,b){
         return b.CiteCount - a.CiteCount; 
     })
     tabulate(data, listFields);
+    //$("html, body").animate({ scrollTop: $(document).height() }, 1000);
+
+    d3.select('#searchList').append("h3").text("Text Cloud");
+
+    sendAndGet({"metaStr": metaStr}, searchCloud_url, "POST", presentCloud);
+}
+
+function presentCloud(res)
+{
+    var list = Object.keys(res).map(function(d){
+        return {text: d, size: res[d]}; 
+    }).sort(function(a,b){
+        return b.size-a.size;
+    });
+
+    list = list.slice(0,40);
+    var range = d3.extent(list, function(d){return d.size});
+    list.forEach(function(d){
+        d.size = (d.size-range[0])/(range[1]-range[0])*50+30;
+    })
+
+    var cloudID = "searchListCloud";
+
+    d3.select('#searchList')
+      .append("div")
+        .attr("id", cloudID);
+
+    var textCloud = new TextCloud(cloudID);
+    textCloud.present(list);
+
     $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 }
 
@@ -99,6 +125,8 @@ function tabulate(data, c0)
     columns = c0.slice(0,-1);
 
     d3.select('#searchList').html("");
+
+    d3.select('#searchList').append("h3").text("Paper List");
     var table = d3.select('#searchList').append('table')
         .attr("class", "table")
     var thead = table.append('thead')
@@ -125,7 +153,9 @@ function tabulate(data, c0)
       .enter()
       .append('td')
         .html(function (d) { return d.value; });
-    
+
+
+   
     return table;
 }
 
@@ -145,8 +175,6 @@ function makeSearch()
         }
     }
  
-
-
     let data = {"content": text, "options": JSON.stringify(optionChosen)};
     let callback;
     if(optionChosen["Chart Type"] == "River Chart")
@@ -207,4 +235,3 @@ function initWidget(navOptions)
     $("#btn-usage").click(function(){$("#dvUsage").toggle()});
     $("#dvUsageClick").click(function(){$("#dvUsage").hide()});
 }
-

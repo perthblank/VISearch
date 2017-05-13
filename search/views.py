@@ -24,30 +24,6 @@ def searchLine(request):
 
 
 @csrf_exempt 
-def searchRiver(request):
-    if request.method == "POST":
-        mdb_hand = mdb.MDB()
-        data = mdb_hand.searchRiver(request.POST.get('content'), request.POST.get('qtype'))
-        return HttpResponse(
-            json.dumps(data),
-            content_type="application/json"
-        );
-    return "ERROR!!!!!"
-
-#@csrf_exempt 
-#def searchHeat(request):
-#    if request.method == "POST":
-#        mdb_hand = mdb.MDB()
-#        data = mdb_hand.searchHeat(request.POST.get('content'), request.POST.get('qtype'))
-#        #print data
-#        return JsonResponse(data);
-#        #return HttpResponse(
-#        #    json.dumps(data),
-#        #    content_type="application/json"
-#        #);
-#    return "ERROR!!!!!"
-
-@csrf_exempt 
 def searchList(request):
     if request.method != "POST":
         return "ERROR!!!!!"
@@ -56,10 +32,24 @@ def searchList(request):
     meta = json.loads(request.POST.get('metaStr'))
     data = mdb_hand.searchList(meta, oc)
     return HttpResponse(
+        json.dumps({"res":data, "metaStr": request.POST.get('metaStr')}),
+        content_type="application/json"
+    );
+
+
+@csrf_exempt 
+def searchCloud(request):
+    if request.method != "POST":
+        return "ERROR!!!!!"
+    oc = OptionConfig()
+    mdb_hand = mdb.MDB()
+    meta = json.loads(request.POST.get('metaStr'))
+    data = mdb_hand.searchCloud(meta, oc)
+    return HttpResponse(
         json.dumps(data),
         content_type="application/json"
     );
-    #return JsonResponse(data)
+
 
 @csrf_exempt 
 def search(request):

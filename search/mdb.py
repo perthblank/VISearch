@@ -1,5 +1,6 @@
 import pymongo
 import pprint
+import stopWords
 
 class MDB(object):
     def __init__(self):
@@ -21,22 +22,6 @@ class MDB(object):
     def __byText(self, year, content):
         return {"Year":year, "$text":{"$search":content}}
 
-    """
-    def searchPerYear(self, content):
-        content = content.strip().lower();
-        contents = content.split(' ');
-        te = []
-        kw = []
-        for year in range(self.startYear, self.endYear+1):
-            count = self.coll.find({"Year":year, "$text":{"$search":content}}).count()
-            te.append({"year":year, "count":count})
-            count = self.coll.find({"Year":year, "Author Keywords":{"$all":contents}}).count()
-            kw.append({"year":year, "count":count})
-            
-        return {"text":te, "keyword":kw}
-    """
-
-    #def searchFreq(self, content, qtype, oc):
     def groupbyMulti(self, content, qtype, criterion, oc):
         content = content.lower()
         contentlist = [w.strip() for w in content.split(",")]
@@ -64,7 +49,6 @@ class MDB(object):
         return {"data":res, "keys":contentlist, "qtype":qtype, "search": ""} 
 
 
-    #def searchCited(self, content, qtype, oc):
     def groupbyConf(self, content, qtype, criterion, oc):
         res = {}
         confs = {}
@@ -92,16 +76,14 @@ class MDB(object):
 
         return {"data":res_arr, "keys": confs.keys(), "qtype": qtype, "search": content};
 
-    def searchList(self, meta, oc):
-        fields = meta["fields"]
-        qtype = meta["qtype"]
-        data = meta["data"]
 
-    	res = []
+    def findEntries(self, meta, oc):
+        qtype = meta["qtype"]
+        query = meta["query"]
+
         found = 0
-        fields = fields.split(",")
-        year = data["year"]
-        key = data["key"]
+        year = query["year"]
+        key = query["key"]
         condition = {"Year": int(year)}
         keyArr = key.split(" ");
 
@@ -110,11 +92,16 @@ class MDB(object):
         else:
             condition["$text"] = {"$search":key}
 
-        if "conference" in data:
-            condition["Conference"] = data["conference"]
+        if "conference" in query:
+            condition["Conference"] = query["conference"]
 
         found = self.coll.find(condition)
-
+        return found
+       
+    def searchList(self, meta, oc):
+        found = self.findEntries(meta, oc);
+        fields = meta["fields"].split(",")
+    	res = []
         for ent in found:
             v = {};
             for f in fields:
@@ -123,3 +110,19 @@ class MDB(object):
             
         return res
 
+    def searchCloud(self, meta, oc):
+        found = self.findEntries(meta, oc);
+        res = dict()
+
+        for ent in found:
+            self.countWord(ent["Abstract"], res)
+
+        return res
+
+    def countWord(self, text, dd):
+        for word in text.split():
+            if word in stopWords.stopWordsSet:
+                continue;
+            dd[word] = dd.get(word,0)+1
+
+    
