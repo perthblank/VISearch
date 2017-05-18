@@ -1,7 +1,7 @@
 ## VISearch
 Visualization system based on [VIS Pub Data](http://www.vispubdata.org/site/vispubdata/)
 
-Demo at: http://35.164.45.239:8000/
+Deployed version at: http://35.164.45.239:8000/
 
 ### Features
 1. Different Chart Types
