@@ -15,12 +15,13 @@ class OptionConfig:
         self.river_te = "River Chart"
         self.heat_te = "Heat Chart"
         self.line_te = "Line"
+        self.cloud_te = "Text Cloud"
 
         self.multi_te = "Multiple Words"
         self.conf_te = "Conferences"
         
         self.__navOptions = [
-                {"label": "Chart Type", "options": [self.river_te, self.heat_te]},
+                {"label": "Chart Type", "options": [self.river_te, self.heat_te, self.cloud_te]},
                 {"label": "Search From", "options": [self.keywords_te, self.text_te]},
                 {"label": "Criterion", "options": [self.freq_te, self.cited_te]},
                 {"label": "Group By", "options": [self.multi_te, self.conf_te]}

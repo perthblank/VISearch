@@ -1,6 +1,8 @@
 import pymongo
 import pprint
 import stopWords
+from index.views import OptionConfig 
+import re
 
 class MDB(object):
     def __init__(self):
@@ -15,12 +17,17 @@ class MDB(object):
         self.startYear = 1990
         self.endYear = 2015
 
-    def __byKeywords(self, year, content):
-        contents = content.split(' ')
-        return {"Year":year, "Author Keywords":{"$all":contents}}
+        self.oc = OptionConfig()
 
-    def __byText(self, year, content):
-        return {"Year":year, "$text":{"$search":content}}
+    def __getCondition(self, qtype, year, content):
+        if(qtype==self.oc.keywords_te):
+            contents = content.split(' ')
+            cond = {"Author Keywords":{"$all":contents}}
+        else:
+            cond = {"$text":{"$search":content}}
+        if(year != "*"):
+            cond["Year"] = year
+        return cond
 
     def groupbyMulti(self, content, qtype, criterion, oc):
         content = content.lower()
@@ -30,10 +37,8 @@ class MDB(object):
         for year in range(self.startYear, self.endYear+1):
             for c in contentlist:
                 ent = {"year":year}
-                if(qtype==oc.keywords_te):
-                    found = self.coll.find(self.__byKeywords(year, c))
-                else:
-                    found = self.coll.find(self.__byText(year, c))
+                condition = self.__getCondition(qtype, year, c)
+                found = self.coll.find(condition)
 
                 if(criterion == oc.cited_te):
                     count = 0;
@@ -53,10 +58,8 @@ class MDB(object):
         res = {}
         confs = {}
         for year in range(self.startYear, self.endYear+1):
-            if(qtype==oc.keywords_te):
-                found = self.coll.find(self.__byKeywords(year, content))
-            else:
-                found = self.coll.find(self.__byText(year, content))
+            condition = self.__getCondition(qtype, year, content)
+            found = self.coll.find(condition)
             res[year] = {};
 
             for ent in found:
@@ -77,20 +80,17 @@ class MDB(object):
         return {"data":res_arr, "keys": confs.keys(), "qtype": qtype, "search": content};
 
 
-    def findEntries(self, meta, oc):
+    def findEntries(self, meta):
         qtype = meta["qtype"]
         query = meta["query"]
 
-        found = 0
-        year = query["year"]
-        key = query["key"]
-        condition = {"Year": int(year)}
-        keyArr = key.split(" ");
-
-        if(qtype==oc.keywords_te):
-            condition["Author Keywords"] = {"$all":keyArr} 
+        if "year" in query:
+            year = query["year"]
         else:
-            condition["$text"] = {"$search":key}
+            year = "*"
+        key = query["key"]
+
+        condition = self.__getCondition(qtype, year, key);
 
         if "conference" in query:
             condition["Conference"] = query["conference"]
@@ -98,8 +98,8 @@ class MDB(object):
         found = self.coll.find(condition)
         return found
        
-    def searchList(self, meta, oc):
-        found = self.findEntries(meta, oc);
+    def searchList(self, meta):
+        found = self.findEntries(meta);
         fields = meta["fields"].split(",")
     	res = []
         for ent in found:
@@ -110,17 +110,16 @@ class MDB(object):
             
         return res
 
-    def searchCloud(self, meta, oc):
-        found = self.findEntries(meta, oc);
+    def searchCloud(self, meta):
+        found = self.findEntries(meta)
         res = dict()
 
         for ent in found:
             self.countWord(ent["Abstract"], res)
-
         return res
 
     def countWord(self, text, dd):
-        for word in text.split():
+        for word in re.split('[\W\s]', text):
             if word in stopWords.stopWordsSet:
                 continue;
             dd[word] = dd.get(word,0)+1

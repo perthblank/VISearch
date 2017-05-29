@@ -2,6 +2,10 @@ function aalert(data)
 {
     alert(JSON.stringify(data));
 }
+function llog(data)
+{
+    console.log(JSON.stringify(data));
+}
 
 var server_ip = "127.0.0.1"
 var port = "8000"
@@ -40,7 +44,6 @@ function sendAndGet(data, url, type, callback, arg)
         error: function(e, status) {
             console.log(status);
             console.log(e);
-      //      JSON.parse(e.responseText);
             errorModal();
         },
         async: false,
@@ -69,6 +72,15 @@ function presentHeatChart(data)
     heatChart.present(data);
 }
 
+function presentTextCloud(data)
+{
+    $(".dvChart").hide();
+    $("#cloudChart").show();
+    var cloudID = "cloudChart";
+    var textCloud = new TextCloud(cloudID);
+    textCloud.present(getCloudList(data));
+}
+
 function searchList(query)
 {
     var meta = {"query":query};
@@ -90,13 +102,13 @@ function presentList(res)
 
     d3.select('#searchList').append("h3").text("Text Cloud");
 
-    sendAndGet({"metaStr": metaStr}, searchCloud_url, "POST", presentCloud);
+    sendAndGet({"metaStr": metaStr}, searchCloud_url, "POST", presentCloudUnderList);
 }
 
-function presentCloud(res)
+function getCloudList(res)
 {
     var list = Object.keys(res).map(function(d){
-        return {text: d, size: res[d]}; 
+        return {text: d, size: d==""?0:res[d]}; 
     }).sort(function(a,b){
         return b.size-a.size;
     });
@@ -107,6 +119,11 @@ function presentCloud(res)
         d.size = (d.size-range[0])/(range[1]-range[0])*50+30;
     })
 
+    return list;
+}
+
+function presentCloudUnderList(res)
+{
     var cloudID = "searchListCloud";
 
     d3.select('#searchList')
@@ -114,8 +131,7 @@ function presentCloud(res)
         .attr("id", cloudID);
 
     var textCloud = new TextCloud(cloudID);
-    textCloud.present(list);
-
+    textCloud.present(getCloudList(res));
     $("html, body").animate({ scrollTop: $(document).height() }, 1000);
 }
 
@@ -154,8 +170,6 @@ function tabulate(data, c0)
       .append('td')
         .html(function (d) { return d.value; });
 
-
-   
     return table;
 }
 
@@ -163,9 +177,14 @@ function makeSearch()
 {
     let text = $("#inpt-search").val();
     if(text=="")
-        text = "lighting, texture, material, shadow";
+        if(optionChosen["Group By"]== "Conferences" || 
+            optionChosen["Chart Type"]=="Text Cloud")
+            text = "visualization";
+        else
+            text = "lighting, texture, material, shadow";
 
-    if(optionChosen["Group By"]== "Conferences")
+    if(optionChosen["Group By"]== "Conferences" || 
+            optionChosen["Chart Type"]=="Text Cloud")
     {
         let n = text.split(',').length;
         if(n >1)
@@ -181,8 +200,16 @@ function makeSearch()
         callback = presentRiverChart;
     else if(optionChosen["Chart Type"] == "Heat Chart")
         callback = presentHeatChart;
+    else if(optionChosen["Chart Type"] == "Text Cloud")
+    {
+        callback = presentTextCloud;
+        console.log(JSON.stringify(data));
+    }
     else
-        console.log("no chart");
+    {
+        console.log("no chart of "+optionChosen["Chart Type"]);
+        return;
+    }
     sendAndGet(data, search_url, "POST", callback);
 
 

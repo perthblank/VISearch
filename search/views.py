@@ -27,10 +27,9 @@ def searchLine(request):
 def searchList(request):
     if request.method != "POST":
         return "ERROR!!!!!"
-    oc = OptionConfig()
     mdb_hand = mdb.MDB()
     meta = json.loads(request.POST.get('metaStr'))
-    data = mdb_hand.searchList(meta, oc)
+    data = mdb_hand.searchList(meta)
     return HttpResponse(
         json.dumps({"res":data, "metaStr": request.POST.get('metaStr')}),
         content_type="application/json"
@@ -41,10 +40,9 @@ def searchList(request):
 def searchCloud(request):
     if request.method != "POST":
         return "ERROR!!!!!"
-    oc = OptionConfig()
     mdb_hand = mdb.MDB()
     meta = json.loads(request.POST.get('metaStr'))
-    data = mdb_hand.searchCloud(meta, oc)
+    data = mdb_hand.searchCloud(meta)
     return HttpResponse(
         json.dumps(data),
         content_type="application/json"
@@ -64,13 +62,16 @@ def search(request):
     groupby = options["Group By"]
     criterion = options["Criterion"]
 
-    if(groupby == oc.conf_te):
-        data = mdb_hand.groupbyConf(content, qtype, criterion, oc)
+    if(options["Chart Type"]==oc.cloud_te):
+        data = mdb_hand.searchCloud({"query":{"key":content}, "qtype":qtype})
     else:
-        data = mdb_hand.groupbyMulti(content, qtype, criterion, oc)
+        if(groupby == oc.conf_te):
+            data = mdb_hand.groupbyConf(content, qtype, criterion, oc)
+        else:
+            data = mdb_hand.groupbyMulti(content, qtype, criterion, oc)
 
-    data["criterion"] = criterion;
-    data["groupby"] = groupby;
+        data["criterion"] = criterion;
+        data["groupby"] = groupby;
 
     return JsonResponse(data)
 
