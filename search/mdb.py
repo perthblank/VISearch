@@ -4,7 +4,6 @@ import stopWords
 from index.views import OptionConfig 
 import re
 from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.corpus import wordnet as wn
 
 class MDB(object):
     def __init__(self):
