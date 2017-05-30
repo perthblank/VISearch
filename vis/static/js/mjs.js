@@ -39,8 +39,9 @@ function errorModal(text)
 }
 
 
-function sendAndGet(data, url, type, callback, arg) 
+function sendAndGet(data, url, type, callback, arg, modal) 
 {
+    
 	var exec = function(){
     	$.ajax({
     	    url: url,
@@ -62,7 +63,10 @@ function sendAndGet(data, url, type, callback, arg)
 		});
 	};
 
-	showLoading(exec);
+    if(modal===undefined)
+        exec();
+    else
+	    showLoading(exec);
 }
 
 function resetWidget()
@@ -196,7 +200,6 @@ function tabulate(data, c0)
 function makeSearch()
 {
 
-
     let text = $("#inpt-search").val();
     if(text=="")
         if(optionChosen["Group By"]== "Conferences" || 
@@ -231,8 +234,7 @@ function makeSearch()
         console.log("no chart of "+optionChosen["Chart Type"]);
         return;
     }
-    sendAndGet(data, search_url, "POST", callback);
-
+    sendAndGet(data, search_url, "POST", callback, undefined, true);
 
     $("#dvUsage").hide();
 }
