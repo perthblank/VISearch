@@ -7,7 +7,6 @@ class TextCloud
 
     present(words)
     {
-        llog(words);
         var parentID = this._parentID;
         
         var layout = d3.layout.cloud()

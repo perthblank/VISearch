@@ -2,6 +2,7 @@ function aalert(data)
 {
     alert(JSON.stringify(data));
 }
+
 function llog(data)
 {
     console.log(JSON.stringify(data));
@@ -14,6 +15,17 @@ var searchList_url = "/search/list/"
 var searchCloud_url = "/search/cloud/"
 
 var listFields = ["Paper Title","Author Names", "Year", "CiteCount", "Link" ]
+
+function showLoading(callback) {
+
+    $("#loadingModal").modal("show");
+    $("#loadingModal").on("shown.bs.modal",callback);
+}
+
+function hideLoading() {
+    $("#loadingModal").modal("hide");
+}
+
 
 function errorModal(text)
 {
@@ -29,52 +41,60 @@ function errorModal(text)
 
 function sendAndGet(data, url, type, callback, arg) 
 {
-    $.ajax({
-        url: url,
-        data: data,
-        type: type,
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        },
-        success: function(res) {
-            //console.log(res);
-            callback(res,arg); 
+	var exec = function(){
+    	$.ajax({
+    	    url: url,
+    	    data: data,
+    	    type: type,
+    	    headers: {
+    	        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    	    },
+    	    success: function(res) {
+    	        callback(res,arg); 
+				hideLoading();
+    	    },
+    	    error: function(e, status) {
+    	        console.log(status);
+    	        console.log(e);
+    	        errorModal();
+    	    },
+    	    async: false,
+		});
+	};
 
-        },
-        error: function(e, status) {
-            console.log(status);
-            console.log(e);
-            errorModal();
-        },
-        async: false,
+	showLoading(exec);
+}
 
-    });
+function resetWidget()
+{
+    $(".dvChart").hide();
+    tooltip.html("");
 }
 
 function presentLineChart(data)
 {
-    $(".dvChart").hide();
+    resetWidget();
     $("#lineChart").show();
     lineChart.present(data);
 }
 
 function presentRiverChart(data)
 {
-    $(".dvChart").hide();
+    resetWidget();
     $("#riverChart").show();
     riverChart.present(data);
 }
 
 function presentHeatChart(data)
 {
-    $(".dvChart").hide();
+    resetWidget();
     $("#heatChart").show();
     heatChart.present(data);
 }
 
 function presentTextCloud(data)
 {
-    $(".dvChart").hide();
+    resetWidget();
     $("#cloudChart").show();
     var cloudID = "cloudChart";
     var textCloud = new TextCloud(cloudID);
@@ -175,6 +195,8 @@ function tabulate(data, c0)
 
 function makeSearch()
 {
+
+
     let text = $("#inpt-search").val();
     if(text=="")
         if(optionChosen["Group By"]== "Conferences" || 
@@ -203,7 +225,6 @@ function makeSearch()
     else if(optionChosen["Chart Type"] == "Text Cloud")
     {
         callback = presentTextCloud;
-        console.log(JSON.stringify(data));
     }
     else
     {

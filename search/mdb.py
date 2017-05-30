@@ -3,6 +3,8 @@ import pprint
 import stopWords
 from index.views import OptionConfig 
 import re
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import wordnet as wn
 
 class MDB(object):
     def __init__(self):
@@ -122,6 +124,9 @@ class MDB(object):
         for word in re.split('[\W\s]', text):
             if word in stopWords.stopWordsSet:
                 continue;
-            dd[word] = dd.get(word,0)+1
-
-    
+            norm = WordNetLemmatizer().lemmatize(word)
+            if(norm == word): #maybe verb
+                norm2 = WordNetLemmatizer().lemmatize(word,"v")
+                if norm2!=norm:
+                    continue;
+            dd[norm] = dd.get(norm,0)+1
