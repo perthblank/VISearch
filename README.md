@@ -1,8 +1,6 @@
 ## VISearch
 Visualization system based on [VIS Pub Data](http://www.vispubdata.org/site/vispubdata/)
 
-Deployed version at: http://35.164.45.239:8000/
-
 ### Features
 1. Different Chart Types
 1. Customizable Search Options
@@ -11,7 +9,7 @@ Deployed version at: http://35.164.45.239:8000/
 
 ### Easy deployment
 #### Prepare Data
-1. Install mongodb and django on the server
+1. Install mongodb 3.4 and django on the server
 1. Enter `data` folder
     1. Config database in `vconfig.py`
     1. Run `python dataLoader.py`

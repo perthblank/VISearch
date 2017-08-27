@@ -61,6 +61,9 @@ class MDB(object):
         """
         
 
+print "remove db..."
+import subprocess
+subprocess.call("mongo vis --eval 'db.dropDatabase()'", shell=True)
 
 mdb = MDB()
 
