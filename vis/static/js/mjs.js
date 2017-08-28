@@ -42,31 +42,31 @@ function errorModal(text)
 function sendAndGet(data, url, type, callback, arg, modal) 
 {
   
-	var exec = function(){
-  	$.ajax({
-  	  url: url,
-  	  data: data,
-  	  type: type,
-  	  headers: {
-  	    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-  	  },
-  	  success: function(res) {
-  	    callback(res,arg); 
-				hideLoading();
-  	  },
-  	  error: function(e, status) {
-  	    console.log(status);
-  	    console.log(e);
-  	    errorModal();
-  	  },
-  	  async: false,
-		});
-	};
+  var exec = function(){
+    $.ajax({
+      url: url,
+      data: data,
+      type: type,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+      },
+      success: function(res) {
+        callback(res,arg); 
+        hideLoading();
+      },
+      error: function(e, status) {
+        console.log(status);
+        console.log(e);
+        errorModal();
+      },
+      async: true,
+    });
+  };
 
   if(modal===undefined)
     exec();
   else
-	  showLoading(exec);
+    showLoading(exec);
 }
 
 function resetWidget()
@@ -107,7 +107,6 @@ function presentTextCloud(data)
 
 function searchList(query)
 {
-  console.log(query);
   var meta = {"query":query};
   meta["fields"] =  listFields.join(",");
   meta["qtype"] = optionChosen["Search From"];
@@ -116,7 +115,6 @@ function searchList(query)
 
 function presentList(res)
 {
-  console.log("present");
   var data = res["res"];
   var metaStr = res["metaStr"];
 
@@ -164,7 +162,6 @@ function presentCloudUnderList(res)
 
 function tabulate(data, c0) 
 {
-  console.log(data);
   columns = c0.slice(0,-1);
 
   d3.select('#searchList').html("");
@@ -173,7 +170,7 @@ function tabulate(data, c0)
   var table = d3.select('#searchList').append('table')
     .attr("class", "table")
   var thead = table.append('thead')
-  var	tbody = table.append('tbody');
+  var  tbody = table.append('tbody');
   
   thead.append('tr')
     .selectAll('th')
@@ -200,10 +197,13 @@ function tabulate(data, c0)
   return table;
 }
 
-function makeSearch()
+function makeSearch(text, openNew)
 {
 
-  let text = $("#inpt-search").val();
+  if(text == undefined) {
+    text = $("#inpt-search").val();
+  }
+
   if(text=="")
     if(optionChosen["Group By"]== "Conferences" || 
       optionChosen["Chart Type"]=="Text Cloud")
@@ -223,6 +223,35 @@ function makeSearch()
   }
  
   let data = {"content": text, "options": JSON.stringify(optionChosen)};
+  // let callback;
+  // if(optionChosen["Chart Type"] == "River Chart")
+  //   callback = presentRiverChart;
+  // else if(optionChosen["Chart Type"] == "Heat Chart")
+  //   callback = presentHeatChart;
+  // else if(optionChosen["Chart Type"] == "Text Cloud")
+  // {
+  //   callback = presentTextCloud;
+  // }
+  // else
+  // {
+  //   console.log("no chart of "+optionChosen["Chart Type"]);
+  //   return;
+  // }
+
+  // sendAndGet(data, search_url, "POST", callback, undefined, true);
+  // $("#dvUsage").hide();
+
+  let url = new URL(window.location.href).origin + "?q=" + encodeURI(JSON.stringify(data));
+  if(openNew) {
+    window.open(url);
+  } else {
+    window.location.href = url;
+  }
+}
+
+function makeSearchFromQueryStr(str) {
+  let data = JSON.parse(decodeURI(str));
+  let optionChosen = JSON.parse(data.options);
   let callback;
   if(optionChosen["Chart Type"] == "River Chart")
     callback = presentRiverChart;
@@ -237,8 +266,9 @@ function makeSearch()
     console.log("no chart of "+optionChosen["Chart Type"]);
     return;
   }
-  sendAndGet(data, search_url, "POST", callback, undefined, true);
 
+  $("#inpt-search").val(data.content);
+  sendAndGet(data, search_url, "POST", callback, undefined, true);
   $("#dvUsage").hide();
 }
 
@@ -262,7 +292,7 @@ function initWidget(navOptions)
   });
 
   $("#inpt-search").keydown(function(e){checkKey(e);});
-  $("#btn-search").click(makeSearch);
+  $("#btn-search").click(() => makeSearch());
   
   lineChart = new LineChart("lineChart");
   riverChart = new RiverChart("riverChart");
@@ -287,4 +317,22 @@ function initWidget(navOptions)
 
   $("#btn-usage").click(function(){$("#dvUsage").toggle()});
   $("#dvUsageClick").click(function(){$("#dvUsage").hide()});
+
+  $("#btn-back").click(goBack);
+  setTimeout(checkParam, 100);
+}
+
+function checkParam() {
+
+  let url_str = window.location.href;
+  let url = new URL(url_str);
+  let param = url.searchParams.get("q");
+  if(param) {
+    makeSearchFromQueryStr(param);
+  }
+}
+
+function goBack() {
+  let url = new URL(window.location.href);
+  window.location.href = url.origin;
 }

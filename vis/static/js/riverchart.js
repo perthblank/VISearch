@@ -89,58 +89,56 @@ class RiverChart
 
 
     x.domain(d3.extent(data, function(d) { return d.date; }));
-  	z.domain(keys);
+    z.domain(keys);
 
-  	stack.keys(keys);
+    stack.keys(keys);
 
     var stackedData = stack(data)
 
     y.domain((d3.extent(stackedData[stackedData.length-1], function(d) { return d[1]; })));
 
-  	var layer = g.selectAll(".layer")
-  	  .data(stackedData)
-  	  .enter().append("g")
-  	  .attr("class", "layer");
+    var layer = g.selectAll(".layer")
+      .data(stackedData)
+      .enter().append("g")
+      .attr("class", "layer");
 
-  	layer.append("path")
-  	  .attr("class", "area")
-  	  .style("fill", function(d) { return z(d.key); })
-  	  .attr("d", area);
+    layer.append("path")
+      .attr("class", "area")
+      .style("fill", function(d) { return z(d.key); })
+      .attr("d", area);
 
-  	layer//.filter(function(d) { return d[d.length - 1][1] - d[d.length - 1][0] > 0.01; })
-  	  .append("text")
-  	  .attr("x", width - 6)
-  	  .attr("y", function(d) { return y((d[d.length - 1][0] + d[d.length - 1][1]) / 2); })
-  	  .attr("dy", ".35em")
-  	  .style("font", "10px sans-serif")
-  	  .style("text-anchor", "end")
-  	  .text(function(d) { return d.key; });
+    layer//.filter(function(d) { return d[d.length - 1][1] - d[d.length - 1][0] > 0.01; })
+      .append("text")
+      .attr("x", width - 6)
+      .attr("y", function(d) { return y((d[d.length - 1][0] + d[d.length - 1][1]) / 2); })
+      .attr("dy", ".35em")
+      .style("font", "10px sans-serif")
+      .style("text-anchor", "end")
+      .text(function(d) { return d.key; });
 
     layer.attr("opacity", 1)
-	.on("mouseover", function(d, i) {
-  	  svg.selectAll(".layer").transition()
-  	  .duration(250)
-  	  .attr("opacity", function(d, j) {
-  	    return j != i ? 0.6 : 1;
-      })
-	}).on("mouseout", function(d, i) {
-      svg.selectAll(".layer")
-      .transition()
-      .duration(250)
-      .attr("opacity", "1"); 
+      .on("mouseover", function(d, i) {
+        svg.selectAll(".layer").transition()
+        .duration(250)
+        .attr("opacity", function(d, j) {
+          return j != i ? 0.6 : 1;
+        })
+      }).on("mouseout", function(d, i) {
+        svg.selectAll(".layer")
+        .transition()
+        .duration(250)
+        .attr("opacity", "1"); 
+      }).on("mousemove", function(d, i) {
+        var mousex = d3.mouse(this);
+        mousex = mousex[0]+20;
+        var offset = Math.round(x.invert(mousex).getYear()-90);
+        var count = (d[offset][1]-d[offset][0]);
+        var year = offset+1990;
+        var html = getTooltipHtml(criterion, groupby, d.key, searchKey, year, count);
 
-      //tooltip.html("");
-    }).on("mousemove", function(d, i) {
-      var mousex = d3.mouse(this);
-      mousex = mousex[0]+20;
-      var offset = Math.round(x.invert(mousex).getYear()-90);
-	  var count = (d[offset][1]-d[offset][0]);
-      var year = offset+1990;
-      var html = getTooltipHtml(criterion, groupby, d.key, searchKey, year, count);
+        tooltip.html(html).style("visibility", "visible");
 
-      tooltip.html(html).style("visibility", "visible");
-
-   	}).on("click",function(d,i){
+       }).on("click",function(d,i){
 
       var mousex = d3.mouse(this);
       mousex = mousex[0]+20;
@@ -161,8 +159,8 @@ class RiverChart
       .call(d3.axisBottom(x));
 
     g.append("g")
-  	  .attr("class", "axis axis--y")
-  	  .call(d3.axisLeft(y));
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y));
 
     var vertical = d3.select("#"+this.parentID)
       .append("div")

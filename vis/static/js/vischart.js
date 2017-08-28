@@ -9,6 +9,10 @@ var tooltip = d3.select("body")
   .style("top", "80px")
   .style("right", "65px");
 
+function b(str) {
+  return "<b>" + str + "</b>";
+}
+
 function getTooltipHtml(criterion, groupby, dKey, searchKey, year, count)
 {
   var html = "";
@@ -16,27 +20,27 @@ function getTooltipHtml(criterion, groupby, dKey, searchKey, year, count)
   {
     if(groupby == "Multiple Words")
     {
-      html = "<p> key word: " +dKey;
+      html = "<p> key word: " + b(dKey);
     }
     else
     {
-      html = "<p> key word: " +searchKey + 
-        "<br/>conference: " + dKey;
+      html = "<p> key word: " + b(searchKey) + 
+        "<br/>conference: " + b(dKey);
     }
-    html += "<br/>year: " + year +  
-    "<br/>cited " + count + " times(s)</p>";
+    html += "<br/>year: " + b(year) +  
+    "<br/>cited " + b(count) + " times(s)</p>";
   }
   else
   {
     if(groupby == "Multiple Words")
-      html = "<p> key word: " +dKey;
+      html = "<p> key word: " + b(dKey);
     else 
     {
-      html = "<p> key word: " +searchKey + 
-      "<br/> conference: " +dKey;
+      html = "<p> key word: " + b(searchKey) + 
+      "<br/> conference: " + b(dKey);
     }
-    html += "<br/>year: " + year +  
-    "<br/>appeared in " + count + " paper(s)</p>";
+    html += "<br/>year: " + b(year) +  
+    "<br/>appeared in " + b(count) + " paper(s)</p>";
   }
 
   return html;
