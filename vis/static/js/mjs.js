@@ -202,6 +202,10 @@ function makeSearch(text, openNew)
 
   if(text == undefined) {
     text = $("#inpt-search").val();
+  } else {
+    // if search from text given -- click text cloud
+    // default using abstract
+    optionChosen["Search From"] = "Abstract";
   }
 
   if(text=="")
@@ -221,6 +225,11 @@ function makeSearch(text, openNew)
       return;
     }
   }
+
+  if(optionChosen["Search From"] !== "Keywords") {
+    optionChosen["Search From"] = "Abstract";
+  }
+
  
   let data = {"content": text, "options": JSON.stringify(optionChosen)};
   // let callback;
@@ -251,7 +260,12 @@ function makeSearch(text, openNew)
 
 function makeSearchFromQueryStr(str) {
   let data = JSON.parse(decodeURI(str));
-  let optionChosen = JSON.parse(data.options);
+  optionChosen = JSON.parse(data.options);
+
+  let dropDowns = $(".dropdownLabel");
+  dropDowns.each(function(index) {
+    $(this).text(optionChosen[$(this).attr("targ")]);
+  })
   let callback;
   if(optionChosen["Chart Type"] == "River Chart")
     callback = presentRiverChart;
@@ -306,7 +320,7 @@ function initWidget(navOptions)
     let outer = $(this).parent().parent().parent();
     let text = $(this).text();
     outer.find(".dropdownLabel").text(text);
-    let label = outer.find(".olabel").attr("targ");
+    let label = outer.find(".olabel");
     optionChosen[label] = text;
 
   });
@@ -322,12 +336,20 @@ function initWidget(navOptions)
   setTimeout(checkParam, 100);
 }
 
+function getID(f, postfix) {
+  // Search from => Search-from-btn
+  let arr = f.split(' ');
+  arr.push(postfix);
+  return arr.join('-');
+}
+
 function checkParam() {
 
   let url_str = window.location.href;
   let url = new URL(url_str);
   let param = url.searchParams.get("q");
   if(param) {
+
     makeSearchFromQueryStr(param);
   }
 }
