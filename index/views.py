@@ -7,7 +7,7 @@ class OptionConfig:
     def __init__(self):
 
         self.keywords_te = "Keywords"
-        self.text_te = "Title&Abstract"
+        self.text_te = "Abstract"
 
         self.cited_te = "Cited Time"
         self.freq_te = "Frequency"

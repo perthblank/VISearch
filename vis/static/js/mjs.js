@@ -202,9 +202,9 @@ function makeSearch(text, openNew)
 
   if(text == undefined) {
     text = $("#inpt-search").val();
-  } else {
-    // if search from text given -- click text cloud
-    // default using abstract
+  }
+  
+  if(openNew) {
     optionChosen["Search From"] = "Abstract";
   }
 
@@ -226,30 +226,8 @@ function makeSearch(text, openNew)
     }
   }
 
-  if(optionChosen["Search From"] !== "Keywords") {
-    optionChosen["Search From"] = "Abstract";
-  }
-
  
   let data = {"content": text, "options": JSON.stringify(optionChosen)};
-  // let callback;
-  // if(optionChosen["Chart Type"] == "River Chart")
-  //   callback = presentRiverChart;
-  // else if(optionChosen["Chart Type"] == "Heat Chart")
-  //   callback = presentHeatChart;
-  // else if(optionChosen["Chart Type"] == "Text Cloud")
-  // {
-  //   callback = presentTextCloud;
-  // }
-  // else
-  // {
-  //   console.log("no chart of "+optionChosen["Chart Type"]);
-  //   return;
-  // }
-
-  // sendAndGet(data, search_url, "POST", callback, undefined, true);
-  // $("#dvUsage").hide();
-
   let url = new URL(window.location.href).origin + "?q=" + encodeURI(JSON.stringify(data));
   if(openNew) {
     window.open(url);
@@ -261,6 +239,7 @@ function makeSearch(text, openNew)
 function makeSearchFromQueryStr(str) {
   let data = JSON.parse(decodeURI(str));
   optionChosen = JSON.parse(data.options);
+  console.log(JSON.stringify(optionChosen));
 
   let dropDowns = $(".dropdownLabel");
   dropDowns.each(function(index) {
@@ -334,13 +313,6 @@ function initWidget(navOptions)
 
   $("#btn-back").click(goBack);
   setTimeout(checkParam, 100);
-}
-
-function getID(f, postfix) {
-  // Search from => Search-from-btn
-  let arr = f.split(' ');
-  arr.push(postfix);
-  return arr.join('-');
 }
 
 function checkParam() {
