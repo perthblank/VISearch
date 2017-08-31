@@ -239,7 +239,6 @@ function makeSearch(text, openNew)
 function makeSearchFromQueryStr(str) {
   let data = JSON.parse(decodeURI(str));
   optionChosen = JSON.parse(data.options);
-  console.log(JSON.stringify(optionChosen));
 
   let dropDowns = $(".dropdownLabel");
   dropDowns.each(function(index) {
@@ -299,8 +298,10 @@ function initWidget(navOptions)
     let outer = $(this).parent().parent().parent();
     let text = $(this).text();
     outer.find(".dropdownLabel").text(text);
-    let label = outer.find(".olabel");
+    let label = outer.find(".olabel").attr("targ");
     optionChosen[label] = text;
+
+    console.log(optionChosen)
 
   });
   
