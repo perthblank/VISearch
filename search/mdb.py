@@ -129,3 +129,15 @@ class MDB(object):
                 if norm2!=norm:
                     continue;
             dd[norm] = dd.get(norm,0)+1
+
+    def searchAuthor(self, s):
+        res = [];
+        for year in range(self.startYear, self.endYear+1):
+            cond = {"Year": year, "$text":{"$search":"\"" + s + "\""}}
+            count = self.coll.find(cond).count()
+            #res.append({"year": year, s: count})
+            res.append({"count":count, "key": s, "year": year})
+        return {"data": res, "keys": [s]};
+
+    def searchAuthorStr(self, s):
+        pass

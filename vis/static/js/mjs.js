@@ -51,6 +51,7 @@ function sendAndGet(data, url, type, callback, arg, modal)
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
       success: function(res) {
+        //console.log(res)
         callback(res,arg); 
         hideLoading();
       },
@@ -197,15 +198,15 @@ function tabulate(data, c0)
   return table;
 }
 
-function makeSearch(text, openNew)
+function makeSearch(text, openNew, searchFrom)
 {
 
   if(text == undefined) {
     text = $("#inpt-search").val();
   }
   
-  if(openNew) {
-    optionChosen["Search From"] = "Abstract";
+  if(searchFrom) {
+    optionChosen["Search From"] = searchFrom;
   }
 
   if(text=="")
@@ -216,10 +217,9 @@ function makeSearch(text, openNew)
       text = "lighting, texture, material, shadow";
 
   if(optionChosen["Group By"]== "Conferences" || 
-      optionChosen["Chart Type"]=="Text Cloud")
-  {
+      optionChosen["Chart Type"]=="Text Cloud") {
     let n = text.split(',').length;
-    if(n >1)
+    if(n>1)
     {
       alert("Conferences mode supports only single word (or phrase) search");
       return;

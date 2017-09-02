@@ -39,7 +39,7 @@ class TextCloud
             .attr("class", "text-layer")
             .text(function(d) { return d.text; })
             .on("click", function(d,i) {
-              makeSearch(d.text, true);
+              makeSearch(d.text, true, 'Abstract');
             });
        
         layer.attr("opacity", 1)

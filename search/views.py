@@ -64,6 +64,8 @@ def search(request):
 
     if(options["Chart Type"]==oc.cloud_te):
         data = mdb_hand.searchCloud({"query":{"key":content}, "qtype":qtype})
+    elif(options["Search From"]==oc.author_te):
+        data = mdb_hand.searchAuthor(content);
     else:
         if(groupby == oc.conf_te):
             data = mdb_hand.groupbyConf(content, qtype, criterion, oc)
@@ -73,6 +75,8 @@ def search(request):
         data["criterion"] = criterion;
         data["groupby"] = groupby;
 
-    return JsonResponse(data)
-
+    print data
+    ret = JsonResponse(data)
+    print ret
+    return ret
 
