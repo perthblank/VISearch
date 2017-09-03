@@ -17,7 +17,6 @@ var searchCloud_url = "/search/cloud/"
 var listFields = ["Paper Title","Author Names", "Year", "CiteCount", "Link" ]
 
 function showLoading(callback) {
-
   $("#loadingModal").modal("show");
   $("#loadingModal").on("shown.bs.modal",callback);
 }
@@ -34,8 +33,8 @@ function errorModal(text)
 
   $("#errorModalP").text(text);
   $("#errorModal").fadeIn(500, function(){
-  setTimeout(function(){$("#errorModal").fadeOut();},1500) 
-  })
+    setTimeout(function(){$("#errorModal").fadeOut();},1500) 
+  });
 }
 
 
@@ -51,7 +50,6 @@ function sendAndGet(data, url, type, callback, arg, modal)
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
       success: function(res) {
-        //console.log(res)
         callback(res,arg); 
         hideLoading();
       },
@@ -301,8 +299,7 @@ function initWidget(navOptions)
     let label = outer.find(".olabel").attr("targ");
     optionChosen[label] = text;
 
-    console.log(optionChosen)
-
+  
   });
   
   $("html, body").animate({ scrollTop: 0}, 200); 

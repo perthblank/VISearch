@@ -25,7 +25,7 @@ class MDB(object):
             contents = content.split(' ')
             cond = {"Author Keywords":{"$all":contents}}
         else:
-            cond = {"$text":{"$search":content}}
+            cond = {"$text":{"$search":'\"' + content + '\"'}}
         if(year != "*"):
             cond["Year"] = year
         return cond
@@ -120,6 +120,8 @@ class MDB(object):
         return res
 
     def countWord(self, text, dd):
+        if type(text) is float:
+            return
         for word in re.split('[\W\s]', text):
             if word in stopWords.stopWordsSet:
                 continue;
@@ -133,7 +135,7 @@ class MDB(object):
     def searchAuthor(self, s):
         res = [];
         for year in range(self.startYear, self.endYear+1):
-            cond = {"Year": year, "$text":{"$search":"\"" + s + "\""}}
+            cond = {"Year": year, "$text":{"$search":'\"' + s + '\"'}}
             count = self.coll.find(cond).count()
             #res.append({"year": year, s: count})
             res.append({"count":count, "key": s, "year": year})

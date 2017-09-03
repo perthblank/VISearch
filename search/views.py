@@ -75,8 +75,6 @@ def search(request):
         data["criterion"] = criterion;
         data["groupby"] = groupby;
 
-    print data
     ret = JsonResponse(data)
-    print ret
     return ret
 

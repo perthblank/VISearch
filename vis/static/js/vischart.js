@@ -7,7 +7,8 @@ var tooltip = d3.select("body")
   .style("z-index", "20")
   .style("visibility", "hidden")
   .style("top", "80px")
-  .style("right", "65px");
+  .style("padding", "10px")
+  .style("background-color", "rgba(255,255,255,0.7)");
 
 function b(str) {
   return "<b>" + str + "</b>";

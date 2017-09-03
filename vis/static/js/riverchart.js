@@ -10,9 +10,11 @@ class RiverChart
   {
     var keys = meta.keys;
     var data = meta.data;
-
     var ndata = [];
     var curyear = 1990-1;
+    var parseDate = d3.timeParse("%Y");
+
+   
     data.forEach(function(e){
       while(curyear<e.year)
       {
@@ -39,12 +41,16 @@ class RiverChart
     }
 
     meta.data = ndata;
+    meta.data.forEach(function(e){
+      e.date = parseDate(e["year"]);
+    });
     return meta;
   }
 
   present(meta)
   {
     meta = this.convertToRiverData(meta);
+
     d3.select("#"+this.parentID).selectAll("*").remove();
     var keys = meta.keys;
     var data = meta.data;
@@ -66,12 +72,7 @@ class RiverChart
     var width = svg.attr("width") - margin.left - margin.right,
       height = svg.attr("height") - margin.top - margin.bottom;
     
-    var parseDate = d3.timeParse("%Y");
-
-    data.forEach(function(e){
-      e.date = parseDate(e["year"]);
-    });
-    
+   
     var x = d3.scaleTime().range([0, width]),
       y = d3.scaleLinear().range([height, 0]),
       z = d3.scaleOrdinal(d3.schemeCategory10);
@@ -87,7 +88,6 @@ class RiverChart
     var g = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
 
-
     x.domain(d3.extent(data, function(d) { return d.date; }));
     z.domain(keys);
 
@@ -96,6 +96,7 @@ class RiverChart
     var stackedData = stack(data)
 
     y.domain((d3.extent(stackedData[stackedData.length-1], function(d) { return d[1]; })));
+    //console.log(y.domain([0, y.domain()[1]]));
 
     var layer = g.selectAll(".layer")
       .data(stackedData)
@@ -129,14 +130,16 @@ class RiverChart
         .duration(250)
         .attr("opacity", "1"); 
       }).on("mousemove", function(d, i) {
-        var mousex = d3.mouse(this);
-        mousex = mousex[0]+20;
+        var mouse = d3.mouse(this);
+        var mousex = mouse[0]+20;
         var offset = Math.round(x.invert(mousex).getYear()-90);
         var count = (d[offset][1]-d[offset][0]);
         var year = offset+1990;
         var html = getTooltipHtml(criterion, groupby, d.key, searchKey, year, count);
 
         tooltip.html(html).style("visibility", "visible");
+        tooltip.style("left", mousex + 50);
+        tooltip.style("top", mouse[1] + 50);
 
        }).on("click",function(d,i){
 
@@ -187,5 +190,111 @@ class RiverChart
     svg.on("click",function(){
       $("html, body").animate({ scrollTop: 0}, 200); 
     });
+
+//    this.drawAccumulate(meta);
+//  }
+//
+//  drawAccumulate(meta) {
+
+    for(let i = 1; i<meta.data.length; ++i)
+      meta.keys.forEach(k => {
+        meta.data[i][k] += meta.data[i-1][k];
+      });
+    //console.log(meta);
+
+    let accData = [];
+    for(let i = 0; i<meta.keys.length; ++i) {
+      let el = {};
+      let key = meta.keys[i];
+      el.id = i;
+      el.key = key;
+      el.values = [];
+      for(let k = 0; k<meta.data.length; ++k) {
+        el.values.push({
+          date: meta.data[k].date, 
+          val: meta.data[k][key]
+        });
+      }
+      accData.push(el);
+    }
+
+    //console.log(accData);
+
+    //var svg = d3.select("#"+this.parentID).append("svg"),
+    //  margin = {top: 20, right: 20, bottom: 30, left: 50},
+    //  g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    //var chartDiv = document.getElementById(this.parentID);
+    //var divWidth = chartDiv.clientWidth;
+    //var divHeight = chartDiv.clientHeight;
+
+    //svg.attr("width",divWidth-100);
+    //svg.attr("height",divHeight-30);
+
+    //var width = svg.attr("width") - margin.left - margin.right,
+    //  height = svg.attr("height") - margin.top - margin.bottom;
+ 
+
+    //var x = d3.scaleTime().range([0, width]),
+    y = d3.scaleLinear().range([height, 0]),
+    z = d3.scaleOrdinal(d3.schemeCategory10);
+
+    var line = d3.line()
+    .curve(d3.curveBasis)
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.val); });
+
+    //x.domain(d3.extent(meta.data, function(d) { return d.date; }));
+
+    y.domain([
+      0,
+      d3.max(accData, function(c) { return d3.max(c.values, function(d) { return d.val; }); })
+    ]);
+
+    z.domain(accData.map(function(c) { return c.id; }));
+
+    //g.append("g")
+    //    .attr("class", "axis axis--x")
+    //    .attr("transform", "translate(0," + height + ")")
+    //    .call(d3.axisBottom(x));
+
+    g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y))
+        .attr("transform", "translate("+width+",0)")
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .text("Amount, ");
+
+    var acc = g.selectAll(".acc")
+      .data(accData)
+      .enter().append("g")
+        .attr("class", "acc");
+
+    acc.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .attr("fill", "none")
+      .attr("stroke-width", 3)
+      .style("stroke", function(d) { return z(d.id); });
+
+    acc.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values.map(x=> {
+        x.val -= 0.5;
+        return x;
+      })); })
+      .attr("fill", "none")
+      .style("stroke", "#fff");
+
+    acc.append("text")
+        .datum(function(d) { return {id: d.key, value: d.values[d.values.length - 2]}; })
+        .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.val) + ")"; })
+        .attr("x", 3)
+        .attr("dy", "0.35em")
+        .style("font", "10px sans-serif")
+        .text(function(d) { return d.id; });
   }
 }
