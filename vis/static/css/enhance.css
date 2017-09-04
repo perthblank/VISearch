@@ -70,25 +70,21 @@
 }
 */
 
-.navbar-nav
-{
-    max-height:50px;
+.navbar-nav {
+  max-height:50px;
 }
 
-#errorModal
-{
-    display:none;
-    color:white;
-    background-color:gray;
-    padding-left:5px;
-    padding-top:5px;
-    border-radius: 3px;
-    top:60%;
-    z-index:400;
-    left:50%;
-    margin-left:-100px;
-    width:200px;
-    position: absolute;
-
+#errorModal {
+  display:none;
+  color:white;
+  background-color:gray;
+  padding-left:5px;
+  padding-top:5px;
+  border-radius: 3px;
+  top:60%;
+  z-index:400;
+  left:50%;
+  margin-left:-100px;
+  width:200px;
+  position: absolute;
 }
-

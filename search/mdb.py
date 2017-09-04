@@ -1,9 +1,10 @@
 import pymongo
 import pprint
 import stopWords
-from index.views import OptionConfig 
 import re
 from nltk.stem.wordnet import WordNetLemmatizer
+
+from index.views import OptionConfig 
 
 class MDB(object):
     def __init__(self):
@@ -32,7 +33,10 @@ class MDB(object):
 
     def groupbyMulti(self, content, qtype, criterion, oc):
         content = content.lower()
-        contentlist = [w.strip() for w in content.split(",")]
+	# contentlist = [content]
+	# if(qtype != oc.author_te):
+	#     contentlist = [w.strip() for w in content.split(";")]
+	contentlist = [w.strip() for w in content.split(";")]
         res = []
 
         for year in range(self.startYear, self.endYear+1):
@@ -116,21 +120,25 @@ class MDB(object):
         res = dict()
 
         for ent in found:
-            self.countWord(ent["Abstract"], res)
+            self.countWord(ent[meta['count']], res)
         return res
 
     def countWord(self, text, dd):
         if type(text) is float:
             return
-        for word in re.split('[\W\s]', text):
-            if word in stopWords.stopWordsSet:
-                continue;
-            norm = WordNetLemmatizer().lemmatize(word)
-            if(norm == word): #maybe verb
-                norm2 = WordNetLemmatizer().lemmatize(word,"v")
-                if norm2!=norm:
-                    continue;
-            dd[norm] = dd.get(norm,0)+1
+	if type(text) is unicode:
+          for word in re.split('[\W\s]', text):
+              if word in stopWords.stopWordsSet:
+                  continue;
+              norm = WordNetLemmatizer().lemmatize(word)
+              if(norm == word): #maybe verb
+                  norm2 = WordNetLemmatizer().lemmatize(word,"v")
+                  if norm2!=norm:
+                      continue;
+              dd[norm] = dd.get(norm,0)+1
+	elif type(text) is list:
+	  for word in text:
+              dd[word] = dd.get(word,0)+1
 
     def searchAuthor(self, s):
         res = [];

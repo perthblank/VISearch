@@ -63,7 +63,8 @@
     #dvUsage
     {
       position: fixed;
-      padding:100px;
+      padding-top:60px;
+      padding-left:100px;
       background-color: rgba(240,240,240,0.5);
       z-index:22;
     }
@@ -144,13 +145,16 @@
   </nav>
 
     <div id="dvUsage">
+      <h3>VISearch</h3>
+        Visualization platform based on <a href="http://www.vispubdata.org/site/vispubdata/">VIS Pub Data</a>
+      
       <h3>Get Started</h3>
         Just click the <span class="glyphicon glyphicon-search" aria-hidden="true"></span> button on the top right!
       
       <h3>Usage</h3>
       <ul>
         <li><b>Chart Type:</b> support river chart and heat chart</li>
-        <li><b>Search From:</b> where should the searching words appear: in Author Keywords or Abstract & Title </li>
+        <li><b>Search From:</b> where should the searching words appear: <b>Keywords, Abstract, or Author Names</b>  </li>
         <li> <b>Criterion:</b> the aggregate criterion:  
           <ul>
             <li><b>Frequency</b> counts the how many papers in the database that contain the search word(s) in 'search from' option.
@@ -161,7 +165,9 @@
         <li><b>Group By:</b> the group mode:  
           <ul>
             <li><b>Multiple Words</b> 
-              supports mutiple keywords (phrases) when search,  seperated by ','. For exapmple, search 'lighting, spatial selection, texture, material'</li>
+              supports mutiple keywords (phrases) when search, <b>seperated by ; (semicolon)</b>. For exapmple, search 'lighting; spatial selection; texture; material'.<br/>
+	      Phrase search, e.g. 'spatial selection', will be performed as <b>AND</b> operation of each word
+	    </li>
             <li><b>Conferences</b> 
               supports only single keyword (phrase), while the results are grouped to four conferences: VIS, InfoVIS, SciVIS, VAST</li>
           </ul>

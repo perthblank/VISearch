@@ -58,7 +58,7 @@ class RiverChart
     var searchKey = meta.search;
     var groupby = meta.groupby;
     var svg = d3.select("#"+this.parentID).append("svg"),
-      margin = {top: 20, right: 20, bottom: 30, left: 50};
+      margin = {top: 20, right: 50, bottom: 30, left: 50};
 
 
     var chartDiv = document.getElementById(this.parentID);
@@ -163,7 +163,17 @@ class RiverChart
 
     g.append("g")
       .attr("class", "axis axis--y")
-      .call(d3.axisLeft(y));
+      .call(d3.axisLeft(y)
+        .ticks(y.domain()[1])
+      )
+      .append("text")
+        .attr("transform", "translate(0,0), rotate(-90)")
+        .attr("y", 5)
+        .attr("dy", "0.8em")
+	.attr("fill", "black")
+        .text("Each Year");
+
+
 
     var vertical = d3.select("#"+this.parentID)
       .append("div")
@@ -191,6 +201,11 @@ class RiverChart
       $("html, body").animate({ scrollTop: 0}, 200); 
     });
 
+
+    // draw acc lines
+    // use previous g
+    // data form [{id, key, values:[{date, val}]}]
+
     for(let i = 1; i<meta.data.length; ++i)
       meta.keys.forEach(k => {
         meta.data[i][k] += meta.data[i-1][k];
@@ -212,6 +227,8 @@ class RiverChart
       accData.push(el);
     }
 
+
+
     //var x = d3.scaleTime().range([0, width]),
     y = d3.scaleLinear().range([height, 0]),
     z = d3.scaleOrdinal(d3.schemeCategory10);
@@ -228,15 +245,15 @@ class RiverChart
       .y0(function(d) { return y(d.val); })
       .y1(function(d) { return y(d.val-y.domain()[1]/100); });
 
-    g.append("g")
+    let acc_y = g.append("g")
         .attr("class", "axis axis--y acc-el")
-        .call(d3.axisLeft(y))
-        .attr("transform", "translate("+width+",0)")
+        .call(d3.axisRight(y))
+        .attr("transform", "translate(" + (width) + ",0)")
       .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", "0.71em")
-        .text("Amount, ");
+        .attr("transform", "translate(0,50), rotate(-90)")
+        .attr("dy", "-1.0em")
+	.attr("fill", "black")
+        .text("Accumulate");
 
     var acc = g.selectAll(".acc")
       .data(accData)

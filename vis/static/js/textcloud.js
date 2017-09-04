@@ -10,10 +10,9 @@ class TextCloud
     var parentID = this._parentID;
     
     var layout = d3.layout.cloud()
-      .size([$(document).width()*0.9, 500])
+      .size([$(document).width()*0.8, 500])
       .words(words)
       .padding(5)
-      //.rotate(function() { return ~~(Math.random() * 2) * 90; })
       .rotate(function() { return 0; })
       .font("Impact")
       .fontSize(function(d) { return d.size; })
