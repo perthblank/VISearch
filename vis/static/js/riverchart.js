@@ -191,16 +191,10 @@ class RiverChart
       $("html, body").animate({ scrollTop: 0}, 200); 
     });
 
-//    this.drawAccumulate(meta);
-//  }
-//
-//  drawAccumulate(meta) {
-
     for(let i = 1; i<meta.data.length; ++i)
       meta.keys.forEach(k => {
         meta.data[i][k] += meta.data[i-1][k];
       });
-    //console.log(meta);
 
     let accData = [];
     for(let i = 0; i<meta.keys.length; ++i) {
@@ -218,33 +212,9 @@ class RiverChart
       accData.push(el);
     }
 
-    //console.log(accData);
-
-    //var svg = d3.select("#"+this.parentID).append("svg"),
-    //  margin = {top: 20, right: 20, bottom: 30, left: 50},
-    //  g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    //var chartDiv = document.getElementById(this.parentID);
-    //var divWidth = chartDiv.clientWidth;
-    //var divHeight = chartDiv.clientHeight;
-
-    //svg.attr("width",divWidth-100);
-    //svg.attr("height",divHeight-30);
-
-    //var width = svg.attr("width") - margin.left - margin.right,
-    //  height = svg.attr("height") - margin.top - margin.bottom;
- 
-
     //var x = d3.scaleTime().range([0, width]),
     y = d3.scaleLinear().range([height, 0]),
     z = d3.scaleOrdinal(d3.schemeCategory10);
-
-    var line = d3.line()
-    .curve(d3.curveBasis)
-    .x(function(d) { return x(d.date); })
-    .y(function(d) { return y(d.val); });
-
-    //x.domain(d3.extent(meta.data, function(d) { return d.date; }));
 
     y.domain([
       0,
@@ -253,13 +223,13 @@ class RiverChart
 
     z.domain(accData.map(function(c) { return c.id; }));
 
-    //g.append("g")
-    //    .attr("class", "axis axis--x")
-    //    .attr("transform", "translate(0," + height + ")")
-    //    .call(d3.axisBottom(x));
+    var line = d3.area()
+      .x(function(d) { return x(d.date); })
+      .y0(function(d) { return y(d.val); })
+      .y1(function(d) { return y(d.val-y.domain()[1]/100); });
 
     g.append("g")
-        .attr("class", "axis axis--y")
+        .attr("class", "axis axis--y acc-el")
         .call(d3.axisLeft(y))
         .attr("transform", "translate("+width+",0)")
       .append("text")
@@ -271,30 +241,38 @@ class RiverChart
     var acc = g.selectAll(".acc")
       .data(accData)
       .enter().append("g")
-        .attr("class", "acc");
+        .attr("class", "acc acc-el");
 
     acc.append("path")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
-      .attr("fill", "none")
-      .attr("stroke-width", 3)
-      .style("stroke", function(d) { return z(d.id); });
-
-    acc.append("path")
-      .attr("class", "line")
-      .attr("d", function(d) { return line(d.values.map(x=> {
-        x.val -= 0.5;
-        return x;
-      })); })
-      .attr("fill", "none")
+      .attr("stroke-width", 1)
+      .style("fill", function(d) { return z(d.id); })
       .style("stroke", "#fff");
 
     acc.append("text")
-        .datum(function(d) { return {id: d.key, value: d.values[d.values.length - 2]}; })
-        .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.val) + ")"; })
-        .attr("x", 3)
-        .attr("dy", "0.35em")
-        .style("font", "10px sans-serif")
-        .text(function(d) { return d.id; });
+      .datum(function(d) { return {id: d.key, value: d.values[d.values.length - 2]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.val) + ")"; })
+      .attr("x", 3)
+      .attr("dy", "0.35em")
+      .style("font", "10px sans-serif")
+      .text(function(d) { return d.id; });
+
+    let showAccBtn = d3.select("#"+this.parentID)
+      .append("div")
+      .attr("class", "checkbox")
+      .style("position", "absolute")
+      .style("left", "100px")
+      .style("top", "20px");
+    let btnLabel = showAccBtn.append("label");
+    let btnInput = btnLabel.append("input")
+      .attr("type", "checkbox")
+      .attr("checked", "true");
+    btnLabel.append("span")
+      .html("Show Accumulate Curve");
+
+    btnInput.on("click", ()=> {
+      $(".acc-el").toggle();
+    })
   }
 }

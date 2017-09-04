@@ -8,13 +8,7 @@ Visualization system based on [VIS Pub Data](http://www.vispubdata.org/site/visp
 1. Text Cloud
 
 ### Easy deployment
-#### Prepare Data
-1. Install mongodb 3.4 and django on the server
-1. Enter `data` folder
-    1. Config database in `vconfig.py`
-    1. Run `python dataLoader.py`
-
-1. Enter main folder, run `python manage.py runserver 0.0.0.0:8000`
-
-#### Test
-Press *Enter* button on the search input. This will give you a default testing visualization on "lighting, texture, material, shadow"
+1. Install mongodb 3.4 on the server
+1. Run `bash setup.sh`
+1. Install `wordnet` for python `nltk`
+1. Run `python manage.py runserver 0.0.0.0:8000`
