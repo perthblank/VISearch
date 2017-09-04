@@ -64,25 +64,25 @@ class MDB(object):
         '''
         
 
-# print 'remove db...'
-# import subprocess
-# subprocess.call("mongo vis --eval 'db.dropDatabase()'", shell=True)
-# 
-# mdb = MDB()
-# 
-# print 'insert data...'
-# mdb.insert(df)
-# 
-# 
-# print 'create index...'
-# mdb.createTextIndex();
-# 
-# print 'test...'
-# mdb.coll.find_one({'Year':1995, '$text':{'$search':'geographic'}})
-# 
-# print 'ok'
+print 'remove db...'
+import subprocess
+subprocess.call("mongo vis --eval 'db.dropDatabase()'", shell=True)
 
 mdb = MDB()
-k = mdb.coll.find({'$text': {'$search': u'"page"'}, 'Year': 2001})
-for h in k:
-    print h
+
+print 'insert data...'
+mdb.insert(df)
+
+
+print 'create index...'
+mdb.createTextIndex();
+
+print 'test...'
+mdb.coll.find_one({'Year':1995, '$text':{'$search':'geographic'}})
+
+print 'ok'
+
+# mdb = MDB()
+# k = mdb.coll.find({'$text': {'$search': u'"page"'}, 'Year': 2001})
+# for h in k:
+#     print h
