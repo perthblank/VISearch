@@ -10,5 +10,4 @@ Visualization system based on [VIS Pub Data](http://www.vispubdata.org/site/visp
 ### Easy deployment
 1. Install mongodb 3.4 on the server
 1. Run `bash setup.sh`
-1. Install `wordnet` for python `nltk`
 1. Run `python manage.py runserver 0.0.0.0:8000`
