@@ -25,6 +25,9 @@ class MDB(object):
         if(qtype==self.oc.keywords_te):
             contents = content.split(' ')
             cond = {"Author Keywords":{"$all":contents}}
+        elif(qtype==self.oc.mix_te):
+            content = ' '.join(map(lambda x:"\""+x+"\"", content.split(' ')))
+            cond = {"$text":{"$search":content}}
         else:
             cond = {"$text":{"$search":'\"' + content + '\"'}}
         if(year != "*"):
