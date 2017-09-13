@@ -164,7 +164,7 @@ class RiverChart
     g.append("g")
       .attr("class", "axis axis--y")
       .call(d3.axisLeft(y)
-        .ticks(y.domain()[1])
+        .ticks(Math.min(y.domain()[1], 10))
       )
       .append("text")
         .attr("transform", "translate(0,0), rotate(-90)")

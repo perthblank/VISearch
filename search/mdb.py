@@ -22,9 +22,14 @@ class MDB(object):
         self.oc = OptionConfig()
 
     def __getCondition(self, qtype, year, content):
+        #content = ' '.join(map(lambda x: "\""+x+"\"", content.split(' ')))
+        #print(content);
         if(qtype==self.oc.keywords_te):
             contents = content.split(' ')
             cond = {"Author Keywords":{"$all":contents}}
+        elif(qtype==self.oc.authorTopic_te):
+            content = ' '.join(map(lambda x: "\""+x+"\"", content.split(' ')))
+            cond = {"$text":{"$search": content}}
         else:
             cond = {"$text":{"$search":'\"' + content + '\"'}}
         if(year != "*"):
@@ -36,7 +41,7 @@ class MDB(object):
 	# contentlist = [content]
 	# if(qtype != oc.author_te):
 	#     contentlist = [w.strip() for w in content.split(";")]
-	contentlist = [w.strip() for w in content.split(";")]
+        contentlist = [w.strip() for w in content.split(";")]
         res = []
 
         for year in range(self.startYear, self.endYear+1):
@@ -57,7 +62,6 @@ class MDB(object):
                 res.append(ent)
 
         return {"data":res, "keys":contentlist, "qtype":qtype, "search": ""} 
-
 
     def groupbyConf(self, content, qtype, criterion, oc):
         res = {}
@@ -83,7 +87,6 @@ class MDB(object):
                 res_arr.append({"year":year, "key":conf, "count":count})
 
         return {"data":res_arr, "keys": confs.keys(), "qtype": qtype, "search": content};
-
 
     def findEntries(self, meta):
         qtype = meta["qtype"]

@@ -125,16 +125,18 @@ function presentList(res)
 
   var meta = JSON.parse(metaStr);
 
+  // create topic cloud
   var id1 = 'topic-cloud';
-  d3.select('#searchList').append('h3').text('Popular Topics');
-  d3.select('#searchList').append('div').attr('id', id1);
+  d3.select('#searchList').append('h3').text('Related Topics of the Year');
+  d3.select('#searchList').append('div').attr('id', id1).append('span').text('loading...');
   meta['count'] = 'Abstract';
   metaStr = JSON.stringify(meta);
   sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
 
+  // create author cloud
   var id2 = 'author-cloud';
-  d3.select('#searchList').append('h3').text('Authors');
-  d3.select('#searchList').append('div').attr('id', id2);
+  d3.select('#searchList').append('h3').text('Authors of the Year');
+  d3.select('#searchList').append('div').attr('id', id2).append('span').text('loading...');
   meta['count'] = 'Author Names';
   metaStr = JSON.stringify(meta);
   sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id2);
