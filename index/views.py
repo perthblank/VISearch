@@ -25,7 +25,7 @@ class OptionConfig:
         self.__navOptions = [
           {"label": "Chart Type", "options": [self.river_te, self.heat_te, self.cloud_te]},
           {"label": "Search From", "options": [self.keywords_te, self.text_te, self.author_te, self.mix_te]},
-          {"label": "Criterion", "options": [self.freq_te, self.cited_te]},
+          {"label": "Counter", "options": [self.freq_te, self.cited_te]},
           {"label": "Group By", "options": [self.multi_te, self.conf_te]}
         ]
 
