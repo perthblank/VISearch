@@ -131,7 +131,7 @@ function presentList(res)
   d3.select('#searchList').append('div').attr('id', id1).append('span').text('loading...');
   meta['count'] = 'Abstract';
   metaStr = JSON.stringify(meta);
-  // sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
+  sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
 
   // create author cloud
   var id2 = 'author-cloud-2';
@@ -144,6 +144,7 @@ function presentList(res)
 
 function getCloudList(res)
 {
+  
   var list = Object.keys(res).map(function(d){
     return {text: d, size: d==''?0:res[d]}; 
   }).sort(function(a,b){
@@ -155,6 +156,9 @@ function getCloudList(res)
   list.forEach(function(d){
     d.size = (d.size-range[0])/(range[1]-range[0])*50+30;
   })
+
+  console.log("get cloud list res:");
+  console.log(res);
 
   return list;
 }
