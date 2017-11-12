@@ -131,10 +131,10 @@ function presentList(res)
   d3.select('#searchList').append('div').attr('id', id1).append('span').text('loading...');
   meta['count'] = 'Abstract';
   metaStr = JSON.stringify(meta);
-  sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
+  // sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
 
   // create author cloud
-  var id2 = 'author-cloud';
+  var id2 = 'author-cloud-2';
   d3.select('#searchList').append('h3').text('Authors of the Year');
   d3.select('#searchList').append('div').attr('id', id2).append('span').text('loading...');
   meta['count'] = 'Author Names';
@@ -161,7 +161,8 @@ function getCloudList(res)
 
 function presentCloudUnderList(res, cloudID)
 {
-
+  console.log("cloud res " + cloudID);
+  console.log(res);
   var textCloud = new TextCloud(cloudID);
   textCloud.present(getCloudList(res));
   $('html, body').animate({ scrollTop: $(document).height() }, 1000);

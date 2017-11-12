@@ -60,7 +60,7 @@ def search(request):
     options = json.loads(request.POST.get('options'))
     qtype = options["Search From"]
     groupby = options["Group By"]
-    criterion = options["Criterion"]
+    criterion = options["Counter"]
 
     if(options["Chart Type"]==oc.cloud_te):
         data = mdb_hand.searchCloud({"query":{"key":content}, "qtype":qtype})

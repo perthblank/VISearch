@@ -14,7 +14,6 @@ class RiverChart
     var curyear = 1990-1;
     var parseDate = d3.timeParse("%Y");
 
-   
     data.forEach(function(e){
       while(curyear<e.year)
       {
@@ -44,6 +43,7 @@ class RiverChart
     meta.data.forEach(function(e){
       e.date = parseDate(e["year"]);
     });
+    console.log(meta);
     return meta;
   }
 
@@ -226,8 +226,6 @@ class RiverChart
       }
       accData.push(el);
     }
-
-
 
     //var x = d3.scaleTime().range([0, width]),
     y = d3.scaleLinear().range([height, 0]),
