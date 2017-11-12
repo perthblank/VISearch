@@ -46,8 +46,7 @@ function sendAndGet(data, url, type, callback, arg, modal)
       url: url,
       data: data,
       type: type,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
       },
       success: function(res) {
         callback(res,arg); 
@@ -125,7 +124,6 @@ function presentList(res)
 
   var meta = JSON.parse(metaStr);
 
-  // create topic cloud
   var id1 = 'topic-cloud';
   d3.select('#searchList').append('h3').text('Related Topics of the Year');
   d3.select('#searchList').append('div').attr('id', id1).append('span').text('loading...');
@@ -133,7 +131,6 @@ function presentList(res)
   metaStr = JSON.stringify(meta);
   sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
 
-  // create author cloud
   var id2 = 'author-cloud-2';
   d3.select('#searchList').append('h3').text('Authors of the Year');
   d3.select('#searchList').append('div').attr('id', id2).append('span').text('loading...');
@@ -153,12 +150,10 @@ function getCloudList(res)
 
   list = list.slice(0,40);
   var range = d3.extent(list, function(d){return d.size});
+  var offset = range[0] == range[1] ? 0: 30;
   list.forEach(function(d){
-    d.size = (d.size-range[0])/(range[1]-range[0])*50+30;
+    d.size = (d.size-range[0]+1)/(range[1]-range[0]+1)*50 + offset;
   })
-
-  console.log("get cloud list res:");
-  console.log(res);
 
   return list;
 }
