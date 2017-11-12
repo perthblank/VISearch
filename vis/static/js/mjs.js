@@ -125,7 +125,7 @@ function presentList(res)
   var meta = JSON.parse(metaStr);
 
   var id1 = 'topic-cloud';
-  d3.select('#searchList').append('h3').text('Related Topics of the Year');
+  d3.select('#searchList').append('h3').text('Top rated of the Year');
   d3.select('#searchList').append('div').attr('id', id1).append('span').text('loading...');
   meta['count'] = 'Abstract';
   metaStr = JSON.stringify(meta);
