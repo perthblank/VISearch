@@ -43,7 +43,7 @@ class RiverChart
     meta.data.forEach(function(e){
       e.date = parseDate(e["year"]);
     });
-    console.log(meta);
+    //console.log(meta);
     return meta;
   }
 

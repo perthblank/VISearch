@@ -105,7 +105,7 @@ function presentTextCloud(data)
 
 function searchList(query)
 {
-  console.log(query);
+  //console.log(query);
   var meta = {'query':query};
   meta['fields'] =  listFields.join(',');
   meta['qtype'] = optionChosen['Search From'];
@@ -128,7 +128,9 @@ function presentList(res)
   d3.select('#searchList').append('h3').text('Top rated of the Year');
   d3.select('#searchList').append('div').attr('id', id1).append('span').text('loading...');
   meta['count'] = 'Abstract';
+  meta['count'] = 'Author Keywords';
   metaStr = JSON.stringify(meta);
+  console.log(meta);
   sendAndGet({'metaStr': metaStr}, searchCloud_url, 'POST', presentCloudUnderList, id1);
 
   var id2 = 'author-cloud-2';
@@ -160,8 +162,8 @@ function getCloudList(res)
 
 function presentCloudUnderList(res, cloudID)
 {
-  console.log("cloud res " + cloudID);
-  console.log(res);
+  //console.log("cloud res " + cloudID);
+  //console.log(res);
   var textCloud = new TextCloud(cloudID);
   textCloud.present(getCloudList(res));
   $('html, body').animate({ scrollTop: $(document).height() }, 1000);
