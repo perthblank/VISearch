@@ -237,7 +237,7 @@ function makeSearch(text, openNew, searchFrom)
       optionChosen['Chart Type']=='Text Cloud')
       text = 'visualization';
     else
-      text = 'lighting; texture; material; shadow';
+      text = 'lighting; texture; material; shadow; 3d; geometry; tessellation; space';
 
   if(optionChosen['Group By']== 'Conferences' || 
       optionChosen['Chart Type']=='Text Cloud') {
