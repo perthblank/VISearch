@@ -157,6 +157,9 @@ function getCloudList(res)
     d.size = (d.size-range[0]+1)/(range[1]-range[0]+1)*50 + offset;
   })
 
+  console.log("cloud list");
+  console.log(list);
+
   return list;
 }
 
