@@ -1,74 +1,29 @@
-.
-├── README.md
-├── data (data)
-│   ├── data.xlsx
-│   ├── dataLoader.py
-│   └── vconfig.py
-├── db.sqlite3
-├── fileStructures
-├── index
-│   ├── __init__.py
-│   ├── __init__.pyc
-│   ├── admin.py
-│   ├── migrations
-│   │   └── __init__.py
-│   ├── models.py
-│   ├── tests.py
-│   ├── urls.py
-│   ├── urls.pyc
-│   ├── views.py
-│   └── views.pyc
-├── manage.py
-├── search
-│   ├── __init__.py
-│   ├── __init__.pyc
-│   ├── admin.py
-│   ├── mdb.py
-│   ├── mdb.pyc
-│   ├── migrations
-│   │   └── __init__.py
-│   ├── models.py
-│   ├── stopWords.py
-│   ├── stopWords.pyc
-│   ├── tests.py
-│   ├── urls.py
-│   ├── urls.pyc
-│   ├── views.py
-│   └── views.pyc
-├── setup.sh
+list of all important folder/files for the project
+
+├── data (data source and load script)
+├── index (main page url and config data)
+├── manage.py (django entry file)
+├── search (search logic and data base access object)
+│   ├── mdb.py (data base access)
+│   ├── stopWords.py (stop words)
+│   ├── urls.py (search urls)
+│   ├── views.py (search functions)
+├── setup.sh (setup files)
 └── vis
-    ├── __init__.py
-    ├── __init__.pyc
-    ├── settings.py
-    ├── settings.pyc
+    ├── settings.py (main config file)
     ├── static
-    │   ├── css
-    │   │   ├── enhance.css
-    │   │   ├── fonts
-    │   │   │   ├── glyphicons-halflings-regular.eot
-    │   │   │   ├── glyphicons-halflings-regular.svg
-    │   │   │   ├── glyphicons-halflings-regular.ttf
-    │   │   │   ├── glyphicons-halflings-regular.woff
-    │   │   │   └── glyphicons-halflings-regular.woff2
-    │   │   └── vender
-    │   │       └── bootstrap.min.css
-    │   └── js
-    │       ├── heatchart.js
-    │       ├── mjs.js
-    │       ├── riverchart.js
-    │       ├── textcloud.js
-    │       ├── vender
+    │   ├── css (css files)
+    │   └── js (js files)
+    │       ├── vender (dependency js files)
     │       │   ├── bootstrap.min.js
     │       │   ├── d3.layout.cloud.js
     │       │   ├── d3.v4.min.js
     │       │   └── jquery-3.1.1.min.js
+    │       ├── mjs.js (main js file)
+    │       ├── heatchart.js
+    │       ├── riverchart.js
+    │       ├── textcloud.js
     │       └── vischart.js
     ├── templates
     │   └── index
-    │       └── index.html
-    ├── urls.py
-    ├── urls.pyc
-    ├── wsgi.py
-    └── wsgi.pyc
-
-14 directories, 58 files
+    │       └── index.html (static html template)
