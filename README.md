@@ -52,5 +52,4 @@ python manage.py runserver 0.0.0.0:8000
 Hopefully everything is well. Now open `http://localhost:8000/` in browser (Chrome better), click search button to make the default search. You can get the chart now, click on the chart to get the paper list and clouds
 
 
-###
-Contact: corey.hdu@gmail.com
+Huimin's email: corey.hdu@gmail.com
