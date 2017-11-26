@@ -1,0 +1,74 @@
+.
+├── README.md
+├── data (data)
+│   ├── data.xlsx
+│   ├── dataLoader.py
+│   └── vconfig.py
+├── db.sqlite3
+├── fileStructures
+├── index
+│   ├── __init__.py
+│   ├── __init__.pyc
+│   ├── admin.py
+│   ├── migrations
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   ├── urls.py
+│   ├── urls.pyc
+│   ├── views.py
+│   └── views.pyc
+├── manage.py
+├── search
+│   ├── __init__.py
+│   ├── __init__.pyc
+│   ├── admin.py
+│   ├── mdb.py
+│   ├── mdb.pyc
+│   ├── migrations
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── stopWords.py
+│   ├── stopWords.pyc
+│   ├── tests.py
+│   ├── urls.py
+│   ├── urls.pyc
+│   ├── views.py
+│   └── views.pyc
+├── setup.sh
+└── vis
+    ├── __init__.py
+    ├── __init__.pyc
+    ├── settings.py
+    ├── settings.pyc
+    ├── static
+    │   ├── css
+    │   │   ├── enhance.css
+    │   │   ├── fonts
+    │   │   │   ├── glyphicons-halflings-regular.eot
+    │   │   │   ├── glyphicons-halflings-regular.svg
+    │   │   │   ├── glyphicons-halflings-regular.ttf
+    │   │   │   ├── glyphicons-halflings-regular.woff
+    │   │   │   └── glyphicons-halflings-regular.woff2
+    │   │   └── vender
+    │   │       └── bootstrap.min.css
+    │   └── js
+    │       ├── heatchart.js
+    │       ├── mjs.js
+    │       ├── riverchart.js
+    │       ├── textcloud.js
+    │       ├── vender
+    │       │   ├── bootstrap.min.js
+    │       │   ├── d3.layout.cloud.js
+    │       │   ├── d3.v4.min.js
+    │       │   └── jquery-3.1.1.min.js
+    │       └── vischart.js
+    ├── templates
+    │   └── index
+    │       └── index.html
+    ├── urls.py
+    ├── urls.pyc
+    ├── wsgi.py
+    └── wsgi.pyc
+
+14 directories, 58 files
