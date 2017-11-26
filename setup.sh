@@ -6,4 +6,3 @@ sudo pip install django
 sudo pip install nltk
 
 python -m nltk.downloader wordnet
-python ./data/dataLoader.py
